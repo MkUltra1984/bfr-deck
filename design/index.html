@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BFR Deck directions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Single-theme page: this is a mockup of a dark game companion, so it commits to the game's world. */
+  --bg: #0f1014; --panel: #181a21; --panel2: #20232c; --line: #2c3039;
+  --ink: #ece7da; --dim: #9a9686; --gold: #d9b24c; --gold2: #8a6b22; --ember: #e2653f;
+  --good: #6fc98a; --warn: #e0b24a; --bad: #e06c6c;
+  --el-fire: #e0674a; --el-water: #4a9ee0; --el-earth: #6fbf5a; --el-thunder: #e0c84a; --el-light: #f0e6c8; --el-dark: #a06fe0;
+  --display: "Cinzel", "Georgia", serif; --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+  /* layout: intro, then three 560px app frames side by side, each a full mock of the Home screen */
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+a { color: var(--gold); }
+.wrap { max-width: 1840px; margin: 0 auto; padding: 28px 20px 60px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 2rem; margin: 0 0 6px; color: var(--gold); text-wrap: balance; letter-spacing: .02em; }
+h2 { font-family: var(--display); font-size: 1.15rem; margin: 0 0 4px; color: var(--ink); letter-spacing: .03em; }
+.lead { max-width: 68ch; color: var(--dim); margin: 0 0 22px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 18px; }
+.tabs button { font: inherit; font-weight: 600; color: var(--dim); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; cursor: pointer; }
+.tabs button[aria-pressed="true"] { color: var(--gold); border-color: var(--gold); background: #26210f; }
+.tabs button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.directions { display: grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap: 26px; align-items: start; }
+.direction { display: grid; gap: 12px; }
+.direction[hidden] { display: none; }
+.meta { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.meta p { margin: 4px 0; color: var(--dim); }
+.meta b { color: var(--ink); }
+.meta ul { margin: 6px 0 0; padding-left: 18px; color: var(--dim); }
+.frame { width: 560px; max-width: 100%; height: 980px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #15161a; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.5); position: relative; }
+.frame .bar { height: 34px; background: #1d1f25; display: flex; align-items: center; gap: 12px; padding: 0 12px; font-size: .8rem; color: var(--dim); flex: none; }
+.frame .bar b { color: var(--gold); font-family: var(--display); font-weight: 600; letter-spacing: .04em; }
+.frame .bar .x { margin-left: auto; letter-spacing: 6px; }
+.scroll { flex: 1; overflow: hidden; }
+.thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ring { border-radius: 10px; padding: 2px; background: var(--line); }
+.ring.fire { background: var(--el-fire); } .ring.water { background: var(--el-water); } .ring.earth { background: var(--el-earth); }
+.ring.thunder { background: var(--el-thunder); } .ring.light { background: var(--el-light); } .ring.dark { background: var(--el-dark); }
+.ring img { border-radius: 8px; display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.num { font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 2px 10px; font-size: .78rem; font-weight: 600; }
+.pill.good { background: #163122; color: var(--good); } .pill.warn { background: #33280f; color: var(--warn); } .pill.bad { background: #3a1b1b; color: var(--bad); }
+.pill.dimmed { background: var(--panel2); color: var(--dim); }
+
+/* ---------- A. Stage ---------- */
+.a .hero { position: relative; height: 330px; background: #000; overflow: hidden; }
+.a .hero img.art { position: absolute; inset: -40px 0 0 0; width: 100%; height: 130%; object-fit: cover; object-position: 50% 15%; opacity: .9; }
+.a .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(21,22,26,.75) 0%, rgba(21,22,26,.15) 28%, rgba(21,22,26,.05) 50%, rgba(21,22,26,.92) 82%, #15161a 100%); }
+.a .hero .who { position: absolute; left: 18px; top: 16px; z-index: 1; }
+.a .hero .who .name { font-family: var(--display); font-size: 1.5rem; color: var(--ink); text-shadow: 0 2px 10px #000; font-weight: 700; }
+.a .hero .who .lv { font-size: .85rem; color: var(--gold); text-shadow: 0 1px 6px #000; }
+.a .hero .res { position: absolute; right: 18px; top: 18px; z-index: 1; display: grid; gap: 4px; text-align: right; text-shadow: 0 1px 6px #000; }
+.a .hero .res div { font-size: .95rem; font-weight: 700; } .a .hero .res span { color: var(--dim); font-weight: 400; font-size: .75rem; margin-right: 6px; }
+.a .ls { padding: 10px 18px 0; font-size: .78rem; color: var(--dim); }
+.a .ls b { color: var(--gold); font-family: var(--display); font-weight: 600; font-size: .78rem; letter-spacing: .03em; }
+.a .squad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 0 18px; margin-top: -26px; position: relative; z-index: 2; }
+.a .squad .u { text-align: center; font-size: .72rem; line-height: 1.2; }
+.a .squad .u .nm { margin-top: 5px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.a .squad .u.lead .ring { box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(217,178,76,.5); }
+.a .next { display: flex; gap: 10px; padding: 12px 18px 6px; }
+.a .next > div { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.a .next .k { font-size: .72rem; color: var(--dim); } .a .next .v { font-size: 1.05rem; font-weight: 700; }
+.a h3 { font-family: var(--display); font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin: 14px 18px 8px; font-weight: 600; }
+.a .ticker { display: flex; gap: 10px; padding: 0 18px; overflow: hidden; }
+.a .ticker .t { flex: none; width: 92px; text-align: center; font-size: .7rem; }
+.a .ticker .t .ring { width: 72px; margin: 0 auto 4px; }
+.a .ticker .t .tag { display: block; color: var(--gold); font-size: .65rem; }
+.a .banner { margin: 10px 18px 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); }
+.a .banner img { width: 100%; display: block; aspect-ratio: 4/1; object-fit: cover; }
+.a .banner div { padding: 6px 10px; font-size: .8rem; display: flex; justify-content: space-between; align-items: center; }
+.a .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 58px; background: linear-gradient(180deg, #1d1f25, #141519); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; text-align: center; font-size: .68rem; color: var(--dim); }
+.a .nav div svg { width: 22px; height: 22px; display: block; margin: 0 auto 2px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.a .nav div.on { color: var(--gold); }
+
+/* ---------- B. Command ---------- */
+.b .top { display: flex; align-items: center; gap: 10px; padding: 10px 12px 4px; }
+.b .top .av { width: 44px; height: 44px; }
+.b .top .name { font-weight: 700; } .b .top .sub { font-size: .75rem; color: var(--dim); }
+.b .top .right { margin-left: auto; display: flex; gap: 6px; }
+.b .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px 12px; }
+.b .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; position: relative; overflow: hidden; }
+.b .tile .k { font-size: .7rem; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+.b .tile .v { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
+.b .tile .s { font-size: .72rem; color: var(--dim); }
+.b .tile.stripe::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--good); }
+.b .tile.stripe.warn::before { background: var(--warn); }
+.b .tile.wide { grid-column: span 3; }
+.b .tile .spark { position: absolute; right: 8px; bottom: 6px; width: 90px; height: 28px; }
+.b .row { display: flex; gap: 8px; padding: 0 12px; }
+.b .sq { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+.b .sq .ring { width: 100%; }
+.b .sq .u { font-size: .68rem; text-align: center; color: var(--dim); }
+.b .sq .u.lead .ring { box-shadow: 0 0 0 2px var(--gold); }
+.b h4 { margin: 0 0 6px; font-size: .8rem; color: var(--ink); font-weight: 700; display: flex; justify-content: space-between; }
+.b h4 span { color: var(--dim); font-weight: 400; }
+.b .meter { height: 8px; background: var(--panel2); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.b .meter i { display: block; height: 100%; width: 62%; background: linear-gradient(90deg, var(--gold2), var(--gold)); }
+.b table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.b td { padding: 4px 0; border-bottom: 1px solid var(--line); } .b td:last-child { text-align: right; color: var(--dim); }
+.b .ticker { display: flex; gap: 6px; overflow: hidden; margin-top: 6px; }
+.b .ticker .ring { width: 52px; flex: none; }
+.b .nav { display: flex; gap: 2px; padding: 6px 12px; border-bottom: 1px solid var(--line); background: #1a1c22; font-size: .82rem; }
+.b .nav div { padding: 4px 10px; border-radius: 6px; color: var(--dim); } .b .nav div.on { color: var(--gold); background: #262932; }
+
+/* ---------- C. Codex ---------- */
+.c { display: grid; grid-template-columns: 58px 1fr; height: 100%; }
+.c .rail { background: linear-gradient(180deg, #1b1a1f, #121216); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 18px; }
+.c .rail div { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: var(--dim); }
+.c .rail div svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.c .rail div.on { background: #2a2416; color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold2); }
+.c .page { padding: 14px 16px; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #1d1a14 0%, #15161a 55%); }
+.c .frameg { border: 1px solid var(--gold2); border-radius: 6px; padding: 12px 14px; position: relative; background: linear-gradient(180deg, rgba(217,178,76,.05), rgba(0,0,0,0)); }
+.c .frameg::before, .c .frameg::after { content: ""; position: absolute; width: 10px; height: 10px; border: 2px solid var(--gold); }
+.c .frameg::before { left: -2px; top: -2px; border-right: 0; border-bottom: 0; } .c .frameg::after { right: -2px; bottom: -2px; border-left: 0; border-top: 0; }
+.c .title { font-family: var(--display); font-weight: 700; color: var(--gold); letter-spacing: .06em; font-size: .8rem; text-transform: uppercase; margin-bottom: 8px; }
+.c .card { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: start; }
+.c .card .ring { width: 150px; }
+.c .card .nm { font-family: var(--display); font-weight: 600; font-size: 1.05rem; color: var(--ink); margin-bottom: 2px; }
+.c .card .sub { color: var(--dim); font-size: .78rem; margin-bottom: 8px; }
+.c .stat { display: grid; grid-template-columns: 36px 1fr 52px; gap: 8px; align-items: center; font-size: .78rem; margin: 3px 0; }
+.c .stat .b { height: 6px; background: var(--panel2); border-radius: 3px; overflow: hidden; } .c .stat .b i { display: block; height: 100%; background: var(--gold); }
+.c .stat .v { text-align: right; font-weight: 700; }
+.c .skills { margin-top: 10px; font-size: .78rem; color: var(--dim); }
+.c .skills b { color: var(--gold); font-family: var(--display); font-weight: 600; font-size: .72rem; margin-right: 4px; }
+.c .squad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; }
+.c .squad .u { font-size: .68rem; text-align: center; color: var(--dim); }
+.c .squad .u.on .ring { box-shadow: 0 0 0 2px var(--gold); }
+.c .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.c .kv { font-size: .8rem; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; } .c .kv span:nth-child(odd) { color: var(--dim); }
+.c .strip { display: flex; gap: 6px; margin-top: 8px; } .c .strip .ring { width: 48px; }
+.c .note { font-size: .75rem; color: var(--dim); margin-top: 12px; font-style: italic; }
+
+.cite { color: var(--dim); font-size: .85rem; max-width: 80ch; margin-top: 28px; }
+@media (max-width: 1250px) { .directions { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) { .a .squad .u.lead .ring { animation: glow 2.4s ease-in-out infinite alternate; } }
+@keyframes glow { from { box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(217,178,76,.3); } to { box-shadow: 0 0 0 2px var(--gold), 0 0 22px rgba(217,178,76,.7); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Three directions for the BFR Deck home screen</h1>
+  <p class="lead">Each frame is the deck at its real width, 560 px, docked beside BlueStacks. Same content in all three: your squad, level and currencies, the next resets, this week's featured units and a banner. Only the treatment differs. Mix and match is fine: say which parts you like.</p>
+  <div class="tabs" role="tablist">
+    <button type="button" aria-pressed="true" data-show="all">All three</button>
+    <button type="button" aria-pressed="false" data-show="a">A · Stage</button>
+    <button type="button" aria-pressed="false" data-show="b">B · Command</button>
+    <button type="button" aria-pressed="false" data-show="c">C · Codex</button>
+  </div>
+
+  <div class="directions">
+
+    <!-- A -->
+    <section class="direction" data-d="a">
+      <div class="meta">
+        <h2>A · Stage</h2>
+        <p><b>Idea:</b> the leader's full illustration is the hero; the squad stands in front of it like the game's title screen. Big, quiet, pretty. Bottom icon bar like the game's own menu.</p>
+        <ul><li>Best when you mostly glance at it between fights.</li><li>Least information per screen; the data lives one scroll down.</li><li>Sprites can replace the thumbnails once the animations are in.</li></ul>
+      </div>
+      <div class="frame a">
+        <div class="bar"><b>BFR DECK</b><span>Deck · BFRevived · Wiki</span><span class="x">– ▢ ✕</span></div>
+        <div class="scroll">
+          <div class="hero">
+            <img class="art" alt="" data-img="full">
+            <div class="who"><div class="name">Summoner</div><div class="lv">Lv 94 · Rookie · 19 min this session</div></div>
+            <div class="res num"><div><span>Gems</span>699</div><div><span>Zel</span>8,165,576</div><div><span>Karma</span>799,004</div></div>
+          </div>
+          <div class="squad">
+            <div class="u lead"><div class="ring fire"><img alt="" data-img="t10017"></div><div class="nm">Ignis Halcyon Vargas</div></div>
+            <div class="u"><div class="ring water"><img alt="" data-img="t20017"></div><div class="nm">Algor Halcyon Selena</div></div>
+            <div class="u"><div class="ring earth"><img alt="" data-img="t30017"></div><div class="nm">Terra Halcyon Lance</div></div>
+            <div class="u"><div class="ring thunder"><img alt="" data-img="t40017"></div><div class="nm">Fulgur Halcyon Eze</div></div>
+            <div class="u"><div class="ring dark"><img alt="" data-img="t860828"></div><div class="nm">Dusk Haunter Kirke</div></div>
+          </div>
+          <div class="ls"><b>LS</b> Eidolon Ignis Resolve · 50% Atk, 30% HP for Fire types, hugely boosts BB gauge each turn</div>
+          <div class="next num">
+            <div><div class="k">Dailies reset</div><div class="v">9h 58m</div></div>
+            <div><div class="k">Vortex switches</div><div class="v">58m</div></div>
+            <div><div class="k">Selector</div><div class="v">5d 9h</div></div>
+          </div>
+          <h3>Featured this week</h3>
+          <div class="ticker">
+            <div class="t"><div class="ring dark"><img alt="" data-img="t830048"></div>Dark Soul Dranoel<span class="tag">collab</span></div>
+            <div class="t"><div class="ring light"><img alt="" data-img="t50017"></div>Lux Halcyon Atro</div>
+            <div class="t"><div class="ring dark"><img alt="" data-img="t60017"></div>Umbra Halcyon Magress</div>
+            <div class="t"><div class="ring water"><img alt="" data-img="t20017"></div>Algor Halcyon Selena</div>
+            <div class="t"><div class="ring earth"><img alt="" data-img="t30017"></div>Terra Halcyon Lance</div>
+            <div class="t"><div class="ring fire"><img alt="" data-img="t10017"></div>Ignis Halcyon Vargas</div>
+          </div>
+          <div class="banner"><div><span>Collab Summon: Final Fantasy Brave Exvius · 5 gems</span><span class="pill good">1d 17h</span></div></div>
+        </div>
+        <div class="nav">
+          <div class="on"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H3z"/></svg>Home</div>
+          <div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Units</div>
+          <div><svg viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12z"/><path d="M9 20v-6h6v6"/></svg>Gates</div>
+          <div><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M10 20c0-3 3-5 6-5s6 2 6 5"/></svg>Team</div>
+          <div><svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h6"/></svg>Guide</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section class="direction" data-d="b">
+      <div class="meta">
+        <h2>B · Command</h2>
+        <p><b>Idea:</b> a tile grid you scan, not read. Every number that can change colour does: reset timers, pull odds, session length. Closest to how overlay tools for competitive games lay things out.</p>
+        <ul><li>Best if you want everything on one screen with no scrolling.</li><li>Least "Brave Frontier": it is a dashboard first.</li><li>Easiest to extend: a new feature is a new tile.</li></ul>
+      </div>
+      <div class="frame b">
+        <div class="bar"><b>BFR DECK</b><span>Deck · BFRevived · Wiki</span><span class="x">– ▢ ✕</span></div>
+        <div class="nav"><div class="on">Home</div><div>Units</div><div>Gates</div><div>Team</div><div>Guide</div></div>
+        <div class="scroll">
+          <div class="top">
+            <div class="ring fire av"><img alt="" data-img="t10017"></div>
+            <div><div class="name">Summoner <span class="sub">Lv 94 · Rookie</span></div><div class="sub">BlueStacks 19 min · live stats on</div></div>
+            <div class="right"><span class="pill dimmed">dock</span><span class="pill good">live</span></div>
+          </div>
+          <div class="tiles num">
+            <div class="tile"><div class="k">Gems</div><div class="v">699</div><div class="s">+30 since Monday</div></div>
+            <div class="tile"><div class="k">Zel</div><div class="v">8.17M</div><div class="s">Gold Valley Thursday</div></div>
+            <div class="tile"><div class="k">Karma</div><div class="v">799k</div><div class="s">1M for Omni evo</div></div>
+            <div class="tile stripe"><div class="k">Dailies</div><div class="v">9h 58m</div><div class="s">00:00 UTC</div></div>
+            <div class="tile stripe warn"><div class="k">Vortex</div><div class="v">58m</div><div class="s">Cave of Greed next</div></div>
+            <div class="tile stripe"><div class="k">Selector</div><div class="v">5d 9h</div><div class="s">10 new on Friday</div></div>
+            <div class="tile wide">
+              <h4>Squad 1 <span>cost 268 · 5 elements · LS Eidolon Ignis Resolve</span></h4>
+              <div class="sq">
+                <div class="u lead"><div class="ring fire"><img alt="" data-img="t10017"></div>Vargas</div>
+                <div class="u"><div class="ring water"><img alt="" data-img="t20017"></div>Selena</div>
+                <div class="u"><div class="ring earth"><img alt="" data-img="t30017"></div>Lance</div>
+                <div class="u"><div class="ring thunder"><img alt="" data-img="t40017"></div>Eze</div>
+                <div class="u"><div class="ring dark"><img alt="" data-img="t860828"></div>Kirke</div>
+              </div>
+            </div>
+            <div class="tile wide">
+              <h4>Should I pull? FFBE collab <span>5 gems</span></h4>
+              <table><tr><td>New to you</td><td>6 of 8 units · 71% per pull</td></tr><tr><td>≥1 new in 10 pulls</td><td style="color:var(--good)">99.9%</td></tr><tr><td>Gems per new unit</td><td>≈ 7</td></tr></table>
+              <div class="meter"><i></i></div>
+            </div>
+            <div class="tile wide">
+              <h4>Featured this week <span>20 only on these gates</span></h4>
+              <div class="ticker">
+                <div class="ring dark"><img alt="" data-img="t830048"></div><div class="ring light"><img alt="" data-img="t50017"></div><div class="ring dark"><img alt="" data-img="t60017"></div><div class="ring water"><img alt="" data-img="t20017"></div><div class="ring earth"><img alt="" data-img="t30017"></div><div class="ring thunder"><img alt="" data-img="t40017"></div><div class="ring fire"><img alt="" data-img="t10017"></div><div class="ring dark"><img alt="" data-img="t860828"></div>
+              </div>
+            </div>
+            <div class="tile wide">
+              <h4>Today's Vortex <span>switches 16:00</span></h4>
+              <table><tr><td>Every day</td><td>Gathering of Souls · Faerie Paradise · Garden of God</td></tr><tr><td>Saturday extra</td><td>nothing extra</td></tr><tr><td>Tomorrow</td><td>Ruins of Miracles (Miracle Totem)</td></tr></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="direction" data-d="c">
+      <div class="meta">
+        <h2>C · Codex</h2>
+        <p><b>Idea:</b> borrow the game's own menu language: gold corner brackets, engraved headings, dark leather. An icon rail on the left instead of a text tab row, so the page is wider. One unit is always in focus, like the unit book.</p>
+        <ul><li>Best for browsing units and planning; feels like part of the game.</li><li>Most work to keep consistent; every panel needs the frame treatment.</li><li>The rail frees 30 px of height and makes room for a sixth nav item later.</li></ul>
+      </div>
+      <div class="frame">
+        <div class="bar"><b>BFR DECK</b><span>Deck · BFRevived · Wiki</span><span class="x">– ▢ ✕</span></div>
+        <div class="c" style="height: calc(100% - 34px)">
+          <div class="rail">
+            <div class="on"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H3z"/></svg></div>
+            <div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <div><svg viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12z"/><path d="M9 20v-6h6v6"/></svg></div>
+            <div><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M10 20c0-3 3-5 6-5s6 2 6 5"/></svg></div>
+            <div><svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h6"/></svg></div>
+          </div>
+          <div class="page">
+            <div class="frameg">
+              <div class="title">Summoner</div>
+              <div class="kv num"><span>Summoner</span><span>Lv 94 · Rookie</span><span>Gems</span><span>699</span><span>Zel</span><span>8,165,576</span><span>Karma</span><span>799,004</span></div>
+            </div>
+            <div class="frameg" style="margin-top:12px">
+              <div class="title">Leader · Squad 1</div>
+              <div class="card">
+                <div class="ring fire"><img alt="" data-img="t10017"></div>
+                <div>
+                  <div class="nm">Ignis Halcyon Vargas</div>
+                  <div class="sub">Omni · Fire · Cost 45 · Lv 150</div>
+                  <div class="stat num"><span>HP</span><div class="b"><i style="width:69%"></i></div><span class="v">7,454</span></div>
+                  <div class="stat num"><span>ATK</span><div class="b"><i style="width:71%"></i></div><span class="v">2,842</span></div>
+                  <div class="stat num"><span>DEF</span><div class="b"><i style="width:66%"></i></div><span class="v">2,470</span></div>
+                  <div class="stat num"><span>REC</span><div class="b"><i style="width:61%"></i></div><span class="v">2,244</span></div>
+                  <div class="skills"><b>LS</b>Eidolon Ignis Resolve<br><b>SBB</b>Helios Vanguard · 20 hits · 20 BC</div>
+                </div>
+              </div>
+              <div class="squad">
+                <div class="u on"><div class="ring fire"><img alt="" data-img="t10017"></div>Vargas</div>
+                <div class="u"><div class="ring water"><img alt="" data-img="t20017"></div>Selena</div>
+                <div class="u"><div class="ring earth"><img alt="" data-img="t30017"></div>Lance</div>
+                <div class="u"><div class="ring thunder"><img alt="" data-img="t40017"></div>Eze</div>
+                <div class="u"><div class="ring dark"><img alt="" data-img="t860828"></div>Kirke</div>
+              </div>
+            </div>
+            <div class="two">
+              <div class="frameg">
+                <div class="title">Resets</div>
+                <div class="kv num"><span>Dailies</span><span>9h 58m</span><span>Vortex</span><span>58m</span><span>Selector</span><span>5d 9h</span></div>
+              </div>
+              <div class="frameg">
+                <div class="title">Featured</div>
+                <div class="strip"><div class="ring dark"><img alt="" data-img="t830048"></div><div class="ring light"><img alt="" data-img="t50017"></div><div class="ring dark"><img alt="" data-img="t60017"></div><div class="ring water"><img alt="" data-img="t20017"></div></div>
+                <div class="note" style="margin-top:6px">FFBE collab · 1d 17h left</div>
+              </div>
+            </div>
+            <p class="note">Tap any unit to open its codex entry: stats, skills, where to get, and your bookmarks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="cite">Reference points, not copies: the game's own title and unit screens (gold brackets, engraved headings, element rings); overlay tools for competitive games such as Overwolf dashboards, which use small stat tiles with a colour stripe for state; and gacha companions like HoYoLAB's profile page or the Fribbels optimizers, which lead with the squad and put numbers in dense tables. Unit art from the BF Revive CDN.</p>
+</div>
+<script src="img.js"></script>
+<script>
+  for (const img of document.querySelectorAll('img[data-img]')) img.src = IMG[img.dataset.img] || '';
+  const buttons = document.querySelectorAll('.tabs button');
+  for (const b of buttons) b.addEventListener('click', () => {
+    for (const x of buttons) x.setAttribute('aria-pressed', x === b);
+    for (const d of document.querySelectorAll('.direction')) d.hidden = b.dataset.show !== 'all' && d.dataset.d !== b.dataset.show;
+  });
+</script>
+</body>
+</html>

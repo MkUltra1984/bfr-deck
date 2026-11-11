@@ -1,0 +1,176 @@
+/* ==========================================================================================================
+   "Midnight Gilt" (design/redesign-bf-style): the Brave Frontier style layer, loaded after style.css.
+   Rules: no ::before on .tile (the timer stripe owns it), frames are an inset box-shadow, gold is rare,
+   no panel-enter animation, the marquee keeps running. Label floors are absolute (nested em got to 6-9 px).
+   ========================================================================================================== */
+html, body { background: radial-gradient(120% 50% at 50% -8%, #1a1f44 0%, var(--page) 62%) fixed, var(--page); }
+::selection { background: rgba(217,169,60,.35); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262b52; border-radius: 6px; border: 2px solid var(--page); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
+:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+a { color: var(--blue); }
+
+/* type */
+h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; color: var(--gold-light); letter-spacing: .02em; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.12rem; color: var(--gold-light); letter-spacing: .04em; }
+h3 { color: var(--ink); }
+.faint { font-size: max(.85em, 12px); }
+
+/* tab bar (#nav, HTML): crest, quiet tabs, gold underline on the active one */
+#nav { background: linear-gradient(180deg, #11142c, var(--surface-1)); border-bottom: 1px solid var(--line-gold); padding: 0 8px; gap: 0; min-height: 40px; }
+#nav::before { content: ""; flex: none; width: 24px; height: 24px; margin: 0 6px 0 2px; background: url(img/crest.png) center / contain no-repeat; filter: drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+#nav a { position: relative; color: var(--ink-2); padding: 11px 7px; border-radius: 0; font-weight: 500; }
+#nav a:hover { color: var(--ink); background: none; }
+#nav a.on { color: var(--gold-light); background: none; }
+#nav a.on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -1px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); box-shadow: 0 0 10px rgba(217,169,60,.55); }
+#dataAge { font-size: 11px; margin-right: 4px; }
+#refresh { width: 28px; height: 28px; padding: 0; border-radius: 50%; }
+
+/* surfaces: gold hairline + inner echo line (inset shadow, so ::before stays free) */
+.tile, .box, .filters, details.cat, .gdaily, .result, .gstep, .gcard {
+  background: linear-gradient(180deg, var(--surface-1) 0%, #0f1224 100%);
+  border: 1px solid var(--line-gold); border-radius: 10px;
+  box-shadow: inset 0 0 0 2px #0f1224, inset 0 0 0 3px rgba(217,169,60,.10), 0 6px 18px rgba(2,3,12,.45);
+}
+.tile { padding: 10px 12px; }
+.tile .marquee { margin: 0 -12px 8px; padding: 0 12px 8px; }
+.tile .k { font-size: 11px; color: var(--ink-3); letter-spacing: .08em; }
+.tile .v { font-size: 1.3em; font-weight: 700; color: var(--ink); }
+.tile .s { font-size: 12px; color: var(--ink-2); white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.tile h4 { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; color: var(--gold-light); letter-spacing: .04em; }
+.tile h4 > span:last-child { font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; letter-spacing: 0; }
+.tile.stripe::before { background: var(--green); } .tile.stripe.warn::before { background: #f0a43a; } .tile.stripe.bad::before { background: var(--crimson-text); }
+.tile[data-k=gems] .v, .tile[data-k=zel] .v, .tile[data-k=karma] .v { color: var(--gold-light); }
+.tile[data-k=gems] .k::before, .tile[data-k=zel] .k::before, .tile[data-k=karma] .k::before { content: ""; display: inline-block; width: 16px; height: 16px; margin: -3px 6px 0 0; vertical-align: middle; background: center / contain no-repeat; }
+.tile[data-k=gems] .k::before { background-image: url(img/gem.png); } .tile[data-k=zel] .k::before { background-image: url(img/zel.png); } .tile[data-k=karma] .k::before { background-image: url(img/karma.png); }
+.box.warn { border-color: rgba(240,164,58,.5); background: linear-gradient(180deg, #221a10, #1a140c); }
+.box.danger { border-color: rgba(240,112,126,.5); background: linear-gradient(180deg, #2a1218, #1e0e13); }
+
+/* the squad stage and modals: a soft gold glow from below (corner ornaments removed at the author's request) */
+.tile.stagetile, .modal {
+  background-image: radial-gradient(ellipse 80% 70% at 50% 100%, rgba(217,169,60,.10) 0%, transparent 70%), linear-gradient(180deg, #151935 0%, var(--surface-1) 55%, #0d1022 100%);
+}
+.tile.stagetile { padding: 10px 14px 16px; }
+
+/* buttons and chips: neutral by default, gold on hover/focus, one filled gold primary */
+button { background: var(--surface-2); border: 1px solid var(--line); border-radius: 7px; color: var(--ink); transition: border-color .12s ease-out, background .12s ease-out, color .12s ease-out; }
+button:hover { background: var(--surface-3); border-color: var(--gold-dark); }
+button.primary { color: var(--on-gold); font-weight: 600; background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, #b98a2a 100%); border: 1px solid #f7e3a0; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 12px rgba(217,169,60,.25); }
+button.primary:hover { filter: brightness(1.07); background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, #b98a2a 100%); border-color: #fff0c0; }
+button.primary:active { filter: brightness(.95); }
+button.icon.on { color: var(--gold-light); border-color: var(--gold); background: var(--gold-wash); }
+input, select { background: var(--page); border: 1px solid var(--line); border-radius: 7px; }
+input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(217,169,60,.18); }
+.chip { background: var(--surface-2); border-color: var(--line); color: var(--ink-2); font-size: 12.5px; padding: 2px 11px; }
+.chip:hover { border-color: var(--gold-dark); color: var(--ink); }
+.chip[aria-pressed=true], .chip.on { color: var(--gold-light); background: var(--gold-wash); border-color: var(--gold); }
+a.chip { color: var(--blue); }
+.tag { background: var(--surface-2); color: var(--ink-2); font-size: 11px; }
+.tag.green { background: rgba(95,207,138,.12); color: var(--green); }
+.tag.gold { background: var(--gold-wash); color: var(--gold-light); }
+.tag.red { background: rgba(180,35,52,.18); color: var(--crimson-text); }
+.badge { background: var(--gold-wash); color: var(--gold-light); border: 1px solid rgba(217,169,60,.3); }
+
+/* tables */
+th { color: var(--ink-3); font-size: 12px; }
+th, td { border-bottom-color: var(--line-soft); }
+
+/* unit cards: calm plate, element on the top edge, rarity under the art, prestige glow for 7* and Omni */
+.card { background: linear-gradient(180deg, var(--surface-2), #151935); border: 1px solid var(--line); border-top-width: 3px; border-radius: 10px; font-size: 12px; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.card:hover { border-color: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(2,3,12,.55), 0 0 0 1px rgba(217,169,60,.18); }
+.el-1 { border-top-color: var(--el1); } .el-2 { border-top-color: var(--el2); } .el-3 { border-top-color: var(--el3); }
+.el-4 { border-top-color: var(--el4); } .el-5 { border-top-color: var(--el5); } .el-6 { border-top-color: var(--el6); }
+.card img, .slot img, .hero img.big, table.utable .tthumb, .dicons img, .vcard .vart img { background: radial-gradient(circle at 50% 40%, #262b52, #0b0d1a); }
+.card.r7 { box-shadow: 0 0 0 1px rgba(246,216,120,.22), 0 0 12px rgba(246,216,120,.10); }
+.card.r8 { box-shadow: 0 0 0 1px rgba(196,140,255,.32), 0 0 14px rgba(164,106,230,.16); }
+.stars { font-size: max(.9em, 11px); letter-spacing: 0; font-weight: 700; }
+.stars.r1, .stars.r2, .stars.r3, .stars.r4 { color: var(--ink-3); }
+.stars.r5 { color: #c3cce0; }
+.stars.r6 { color: #e6a24a; }
+.stars.r7 { color: #f6d878; text-shadow: 0 0 6px rgba(246,216,120,.45); }
+.stars.r8 { background: linear-gradient(90deg, #f6d878, #f08fb4, #b48cff, #5fd0f0); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: .08em; font-size: max(.85em, 11px); }
+.grid li .mark { background: var(--surface-1); border-color: var(--line); }
+.grid li.owned .card { box-shadow: inset 0 0 0 1px rgba(95,207,138,.35); }
+.grid li.owned .card.r8 { box-shadow: inset 0 0 0 1px rgba(95,207,138,.35), 0 0 0 1px rgba(196,140,255,.32), 0 0 14px rgba(164,106,230,.16); }
+.grid li.picked .card { outline-color: var(--gold); background: #2a2414; }
+.tmlabel, .tier .grid li .trank, .grid li .ownedtag { font-size: 10px; }
+.itile { background: linear-gradient(180deg, var(--surface-2), #151935); border-color: var(--line); font-size: 12px; }
+
+/* home */
+.top .ring { background: linear-gradient(160deg, var(--gold-light), var(--gold-dark)); padding: 2px; }
+.top .name { font-family: var(--font-display); font-size: 1.15rem; color: var(--ink); }
+.tile .sq .u .aname { font-size: 12px; }
+.tile .sq .u.lead::after { font-size: 10px; background: linear-gradient(180deg, rgba(242,210,122,.22), rgba(217,169,60,.10)); border-color: rgba(242,210,122,.55); color: var(--gold-light); }
+.tile .sq .u.empty, .actor.empty { background: url(img/empty.png) center 40% / auto 70% no-repeat; border-color: rgba(217,169,60,.25); }
+.pulltile .verdict { margin: 8px 0 6px; font-size: 1.02rem; font-weight: 600; color: var(--ink); line-height: 1.4; }
+.pulltile .pullacts { margin: 0 0 4px; }
+details.pullmore { margin-top: 4px; border-top: 1px solid var(--line-soft); padding-top: 6px; }
+details.pullmore > summary { color: var(--gold-light); font-size: 13px; margin: 2px 0 6px; }
+.gatenav .gtitle { font-family: var(--font-display); font-size: 1.05rem; color: var(--blue); }
+.metabox { border-left-color: var(--line-soft); }
+.metabox .mtitle { font-family: var(--font-display); color: var(--gold-light); font-size: .98rem; }
+.metabox .dots button.on::before { background: var(--gold-light); box-shadow: 0 0 6px rgba(242,210,122,.6); }
+.bar { background: var(--page); border: 1px solid var(--line); }
+.bar .fill { background: linear-gradient(90deg, var(--gold-dark), var(--gold) 70%, var(--gold-light)); }
+.xp .bar.gold .fill { background: linear-gradient(90deg, var(--crimson-deep), #e2653f, var(--gold-light)); }
+.bar span { text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.banner { background: var(--surface-1); border-color: var(--line-gold); border-radius: 10px; }
+.banner:hover { border-color: var(--gold); }
+.marquee .actor .atag .tag { background: var(--surface-2); }
+/* a unit without any battle sprite: its portrait stands on the stage as a gold-ringed medallion, lifted off the
+   platform glow, gently floating so it reads as part of the line-up rather than a missing picture */
+img.sprite-fallback { opacity: 1; border-radius: 12px; padding: 2px; margin-bottom: 10px; background: linear-gradient(160deg, var(--gold-light), var(--gold-dark));
+  box-shadow: 0 8px 14px rgba(2,3,12,.65), 0 0 16px rgba(217,169,60,.18); animation: medal-float 3.2s ease-in-out infinite; }
+@keyframes medal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.vcard { background: linear-gradient(180deg, var(--surface-2), #151935); border-color: var(--line); }
+.vcard:hover { border-color: var(--gold-dark); }
+.vortextile .vdays .chip.today:not(.on) { border-color: var(--gold-dark); }
+
+/* units filters */
+.filters .flabel { font-size: 11px; color: var(--ink-3); }
+
+/* team builder */
+.slot { background: linear-gradient(180deg, var(--surface-2), #151935); border-color: var(--line); border-radius: 10px; }
+.slot.friend { background: linear-gradient(180deg, #171a33, #121528); }
+.slots.six .slot .slothead, .slot .slothead { font-size: 10.5px; letter-spacing: .04em; }
+.slot .act { background: transparent; border-color: transparent; color: var(--ink-3); }
+.slot .act:hover { color: var(--gold-light); background: var(--gold-wash); border-color: transparent; }
+.slot .sph.on { border-color: var(--gold); }
+.lsbox { background: var(--surface-2); }
+table.matrix tr.missing .tag.red { background: transparent; color: var(--ink-3); font-style: italic; }
+table.matrix .sk { background: var(--surface-2); }
+
+/* tier list */
+.tier .t-S .tbadge { background: linear-gradient(160deg, var(--gold-light), var(--gold-dark)); color: var(--on-gold); }
+.tier .t-A .tbadge { background: linear-gradient(160deg, #d2b6ff, #7a52c4); }
+.tier .t-B .tbadge { background: linear-gradient(160deg, #a9cbf5, #3f6fae); }
+.tier .t-C .tbadge { background: #6a6e92; }
+.tier .tbadge { font-family: var(--font-display); font-size: 1.05rem; }
+
+/* guide */
+.gstep { padding: 12px 14px; } .gstep:hover, .gcard:hover { border-color: var(--gold); }
+.gstep .gnum { color: var(--gold-light); font-family: var(--font-display); }
+.gprog .bar { background: var(--page); }
+.gprog .fill { background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); }
+.gbody h3 { color: var(--gold-light); font-family: var(--font-display); }
+details.cat summary { color: var(--ink); }
+details.cat summary::before { color: var(--gold); }
+p.gives { background: var(--surface-1); border-left-color: var(--gold); }
+
+/* glossary: softer underline */
+.gl { border-bottom: 1px dotted rgba(139,141,171,.45); }
+.gltip { background: linear-gradient(180deg, #171b38, var(--surface-1)); border-color: var(--line-gold); }
+.gltip b { color: var(--gold-light); }
+
+/* overlays, modals, tour, toast */
+.overlay { background: rgba(5,6,16,.72); backdrop-filter: blur(3px); }
+.overlay.intro.tour { background: rgba(5,6,16,.25); backdrop-filter: none; }
+.modal { border: 1px solid var(--line-gold-strong); border-radius: 14px; box-shadow: 0 12px 36px rgba(2,3,12,.65), 0 0 0 4px rgba(217,169,60,.06); }
+.overlay.intro .dots span.on { background: var(--gold-light); box-shadow: 0 0 6px rgba(242,210,122,.6); }
+.overlay.intro .introgem { filter: drop-shadow(0 4px 12px rgba(217,169,60,.35)); }
+.tourfocus { outline-color: var(--gold-light); box-shadow: 0 0 0 6px rgba(217,169,60,.12); }
+.toast { background: linear-gradient(180deg, #2a2414, #1f1a0e); color: var(--gold-light); border-color: var(--gold); box-shadow: 0 8px 24px rgba(2,3,12,.6); }
+.scanwarn { background: rgba(180,35,52,.18); border-color: var(--crimson-text); color: var(--crimson-text); }
+.scan canvas.frame, canvas.calib { border-color: var(--line-gold); }

@@ -1,0 +1,49 @@
+# Changelog
+
+## Unreleased
+
+- **New look, "Midnight Gilt"**: Brave Frontier style, modernized. Indigo-navy panels with a thin gold frame, gold for highlights, crimson only for alerts, serif titles, a crest in the tab bar, 14 px body text with readable label sizes, currency icons on the Gems, Zel and Karma tiles, star ratings coloured by rarity with a soft glow on 7★ and Omni cards, and a pedestal picture in empty squad slots. Window frame and title bar match.
+- **Should I pull?** leads with the verdict; the odds table and the ownership bars open under "See odds and bars".
+- Team Builder says "not yet covered" instead of a red "missing".
+- The squad stage keeps both names of "X and Y" units ("Deemo & the Girl" instead of "Girl").
+- Units without a battle animation on bfrevive.net (new collab units such as the Vocaloid Meiko, Kaito and Sakura Miku) borrow the sprite of another form in their evolution line when one has it; otherwise their portrait stands on the stage as a gold-ringed medallion instead of a plain square icon.
+- Removed leftover status remarks (pity rewards, arena rules, raid notes).
+
+## 1.1.0 (2026-11-08)
+
+- Download: one self-contained `BfrDeck.exe` (no .NET install needed), source on GitHub under the MIT license, illustrated README in English and German.
+- First start: a guided tour. A welcome card, then one card per tab shown over that tab (Home, Units and Box, Tier List, Summon, Quests, Team Builder, Guide and glossary, Dock / Pin / Live), ending with the offer to scan your units. Replay it from the Box page (`intro`), or open `#/home/intro`.
+- **Unit scanner** (`Box › Scan my units`): while you scroll the in-game unit list, the deck grabs the emulator window from the desktop about 15 times a second (any emulator, no adb needed), snaps a fixed 5-column grid to the list's rows and matches every icon against the unit thumbnails (256-bit fingerprint, then greyscale correlation plus a colour check; evolution forms of one unit are treated as a family). No calibration. Rows are tracked by scroll position, so a row is never counted twice and a row you scroll back to fills a gap; a red banner warns while a gap is open. The **×N** count badge is read with the game's own number font, so stacked materials count fully, and the result shows **units including duplicates** next to the unique count to compare with the game's own total. PARTY ribbons are read too: the blinking yellow ribbon marks the main party, which becomes Squad 1; blue ribbons show a PARTY badge. Reset restarts a scan; no captured frame stays on disk. Finish with "replace my box" or "add to my box". Verified on a real first screen: 30 of 30 cells, 27 unique, 45 including duplicates, badges ×4 ×5 ×9, main party 5 of 5.
+- **Tier List** tab: every unit ranked S/A/B/C by the deck's score (max stats against the best in the game plus the roles its skills cover), filter by element, rarity, role and "owned only", tiers collapse. The same score drives the Meta Units box.
+- **Quests** tab groups Vortex, Grand Quest, Story, Frontier Hunter, Frontier Gate and Trials with one catalog style.
+- **Team Builder** (was Team): six slot cards (five units plus the friend lead) with portrait, leader star, swap, remove and drag-to-reorder; two spheres per slot; totals with an imps toggle; the leader and friend leader skills side by side; a buff matrix that shows which slot brings healing, mitigation, BB fill, buffs and so on; gap suggestions from your box; a copyable team code to share a squad.
+- **Guide tab rebuilt as a beginner path**: six first steps with a checkbox each and a progress bar (link account, claim gems, story, selectors, one finished team, the daily loop), an "Every day" checklist that resets at 00:00 UTC, then one card per topic that opens its own page with previous / next links. Notes and links are folded away at the bottom. Search filters the topic cards. The "what works and what to avoid" list and the "sends you Home" notes in the Quests catalog are gone: the content works.
+- **Beginner glossary**: game terms (HP, BB, SBB, spark, mitigation, Omni, SP, Vortex, Merit, every role tag, unit types, …) get a dotted underline wherever they appear; hover one for a plain-words explanation. Chips, tags and table headers show the same explanation as a tooltip.
+- Window: resizable on every edge; minimum size 600×640 so content never needs a horizontal scrollbar; the squad stage sizes and centres sprites by their visual mass.
+- Housekeeping: the disk cache is capped at 300 MB with a 14-day image life, the log is trimmed at 2 MB, debug frames are deleted on start and when a scan stops.
+- Team labels: units that sit in a squad carry a small coloured label (one colour per squad) on their icon in the unit list, the box, the picker and the scan results.
+- Should I pull: an **"I pulled…"** button opens a multi-select of the gate's pool so a summon session can be logged in one go, keeping the odds and bars current without a rescan.
+- App icon: Phaedra (`tools/make-icon.ps1 -Unit <id>` rebuilds `app.ico` from any unit thumbnail).
+- Live header: the summoner name is read from the game and shown instead of "Summoner" (type your own to override); gems and level read reliably now (the OCR reads whole panels instead of tiny crops). `--debugframes` keeps the captured frame and OCR crops in `%LOCALAPPDATA%\BfrDeck` for tuning.
+
+- Home: the Today's Vortex table is now the **Vortex Gate** tile: the week as day chips (click a day to preview it), one card per open dungeon with what it gives in plain words (Karma farm, Mimics, Totems, Jewel units for Zel…) and its captures or drops as art, the running event, and a link to the full catalog. Cards scroll with the wheel, the arrows, or by holding the left button and dragging; a card opens the dungeon page (levels, captures with chance, drops, clear rewards, enemies).
+- Tabs: **Gates** is now **Summon**. New **Vortex** tab: every Vortex dungeon in the game data grouped like the in-game gate (Enhancement, Travellers, Vortex Trials, Seasons Past, Special Quests, …, plus limited and event dungeons), each with its reward summary and icons, "today" and "event running" tags. New **Grand Quest** tab: the chapters and episodes with their clear rewards. Area pages at `#/vortex/area/<id>`.
+- Home: the featured-units marquee and the Meta Units box can be dragged with the mouse (hold the left button and move; the marquee resumes from where you let go, Meta Units walks through its picks).
+- Dock: after docking, the two windows stay together. The deck follows every step of an emulator drag or resize (window event hook, no polling lag); dragging the deck carries the emulator along. Works with BlueStacks, LDPlayer, Nox, MEmu, MuMu, GameLoop, the Android Studio emulator and Google Play Games by process name; for anything else (or with Shift held) click Dock and then click the emulator window. Click **Docked** to undock; the dock also ends when the emulator window closes.
+- Meta Units: the dots are buttons; click one to jump to that unit.
+- Vortex cards: reward pictures come from the guide table where it names them (Imp and Jewel God unit icons). Karma, Zel and gems use clean 256 px redraws of the in-game HUD icons (`wwwroot/img/karma.png`, `zel.png`, `gem.png`, made from a screenshot with `tools/redraw-currency-icons.ps1`); SVG fallbacks of the same three stay next to them.
+- Unit picker (squad slots on Home and Team): the list keeps growing as you scroll instead of stopping at 48 results.
+
+## 1.0.0 (2026-11-07)
+
+First release. A read-only desktop companion for Brave Frontier Revived.
+
+- Home: leader portrait (Omni Vargas until a squad leader is set), live gems / Zel / Karma read from the emulator (optional, off by default), reset timers with state stripes, squad stage with battle sprites, Should-I-pull with per-rarity odds and EXP-style acquisition bars, Meta Units for the selected gate, featured-units marquee (newest collab first), banners, today's Vortex.
+- Units: search with element / rarity / owned filters, owned and bookmark marks, box page with collection progress, bookmarks with where-to-get, unit pages with sprites, skills, roles, where-to-get.
+- Items: search, drops, clear rewards, shops, recipes.
+- Gates: featured / permanent / rotation, per-gate pools and odds, Should-I-pull.
+- Team: squad editor, "what a good team needs" checklist, export / import, calculators (evolution, frogs, SP, imps).
+- Guide: the Discord beginner guide, searchable.
+- Shell: custom dark title bar, tabs for bfrevive.net and the wiki, dock beside BlueStacks (`--dock`), pin on top, disk cache for the feeds, `--deck <route>` and `--ocrtest <png>` switches.
+
+Known: the live-stats level box reads empty (gems, Zel, Karma work).

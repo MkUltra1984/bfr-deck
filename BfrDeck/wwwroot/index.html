@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BFR Deck</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme-gilt.css">
+</head>
+<body>
+<nav id="nav">
+  <a href="#/home" data-v="home">Home</a>
+  <a href="#/units" data-v="units">Units</a>
+  <a href="#/tier" data-v="tier">Tier List</a>
+  <a href="#/summon" data-v="summon">Summon</a>
+  <a href="#/quests/vortex" data-v="quests">Quests</a>
+  <a href="#/team" data-v="team">Team Builder</a>
+  <a href="#/guide" data-v="guide">Guide</a>
+  <span class="grow"></span>
+  <span id="dataAge" class="faint" title="Age of the cached game data"></span>
+  <button id="refresh" class="icon" title="Refresh game data" aria-label="Refresh game data">&#x21bb;</button>
+</nav>
+<main id="view"><p class="dim">Loading…</p></main>
+<script src="util.js"></script>
+<script src="data.js"></script>
+<script src="rules.js"></script>
+<script src="sprite.js"></script>
+<script src="collection.js"></script>
+<script src="roles.js"></script>
+<script src="view-home.js"></script>
+<script src="view-vortex.js"></script>
+<script src="view-scan.js"></script>
+<script src="view-tier.js"></script>
+<script src="glossary.js"></script>
+<script src="view-units.js"></script>
+<script src="view-items.js"></script>
+<script src="view-gates.js"></script>
+<script src="view-plan.js"></script>
+<script src="view-team.js"></script>
+<script src="guide.js"></script>
+<script src="view-guide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

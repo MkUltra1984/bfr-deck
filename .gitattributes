@@ -1,0 +1,5 @@
+# Normalise line endings in the repo; checkout uses the platform default.
+* text=auto
+*.png binary
+*.gif binary
+*.apk binary

@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>BfrDeck</AssemblyName>
+    <RootNamespace>BfrDeck</RootNamespace>
+    <Version>1.1.0</Version>
+    <Authors>MkUltra1984</Authors>
+    <Description>BFR Deck: a read-only desktop companion for Brave Frontier Revived.</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Release download: one self-contained exe (no .NET install needed). Plain single-file, no compression,
+         no trimming, no obfuscation: the least likely shape to trip antivirus heuristics for an unsigned app. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishDocumentationFiles>false</PublishDocumentationFiles>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+    <DebugType>none</DebugType>
+    <!-- the binaries must not carry the build machine's folder names -->
+    <PathMap>$(MSBuildProjectDirectory)=/src</PathMap>
+    <Copyright>Copyright (c) 2026 MkUltra1984. MIT License.</Copyright>
+    <Product>BFR Deck</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Dev builds read wwwroot next to the exe (edit JS, press reload). The published single exe carries the same
+         files as embedded resources and unpacks them to %LOCALAPPDATA%\BfrDeck\wwwroot\<version> on first start. -->
+    <Content Include="wwwroot\**\*" Condition="'$(PublishSingleFile)' != 'true' Or '$(_IsPublishing)' != 'true'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="wwwroot\**\*" LogicalName="wwwroot/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

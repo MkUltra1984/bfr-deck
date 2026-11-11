@@ -1,0 +1,26 @@
+# build output
+bin/
+obj/
+publish/
+*.user
+*.suo
+.vs/
+
+# the game client is not ours to distribute
+*.apk
+
+# local data / scratch
+*.log
+design/img.js
+design/currency-icons/*-raw.png
+message-to-joppe.txt
+.claude/
+screenshot-*.png
+docs/img/test/
+
+# AI-assistant working notes with local machine details; not part of the public project
+CLAUDE.md
+
+# secrets (API keys); never commit
+.env
+.env.*

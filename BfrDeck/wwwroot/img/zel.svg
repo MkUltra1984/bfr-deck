@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="coin" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#f2c744"/><stop offset=".8" stop-color="#b97d12"/><stop offset="1" stop-color="#7a4f05"/></radialGradient>
+    <radialGradient id="rim" cx=".5" cy=".5" r=".5"><stop offset=".82" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000" flood-opacity=".6"/></filter>
+  </defs>
+  <g filter="url(#s)">
+    <circle cx="32" cy="32" r="25" fill="url(#coin)" stroke="#6b4508" stroke-width="1.5"/>
+    <circle cx="32" cy="32" r="25" fill="url(#rim)"/>
+    <circle cx="32" cy="32" r="20" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>
+    <!-- the wave / swirl of the Zel coin -->
+    <g fill="none" stroke="#8a5a0a" stroke-width="3" stroke-linecap="round" stroke-opacity=".85">
+      <path d="M15 30 C 22 20, 30 22, 32 32 S 42 44, 49 34"/>
+      <path d="M18 40 C 26 36, 30 38, 34 42"/>
+      <path d="M30 20 C 36 18, 40 20, 46 26"/>
+    </g>
+    <g fill="none" stroke="#fff3c4" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".8">
+      <path d="M15 28.5 C 22 18.5, 30 20.5, 32 30.5 S 42 42.5, 49 32.5"/>
+    </g>
+    <ellipse cx="25" cy="19" rx="10" ry="5" fill="url(#shine)"/>
+  </g>
+</svg>
