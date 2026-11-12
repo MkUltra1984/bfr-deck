@@ -187,3 +187,14 @@ p.gives { background: var(--surface-1); border-left-color: var(--gold); }
 #updbar.bad { background: rgba(180,35,52,.18); border-bottom-color: var(--crimson-text); }
 #updbar.bad b { color: var(--crimson-text); }
 .updline { margin-top: 6px; }
+
+/* suggested spheres (spheres.js) */
+.sphcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; }
+.sphcard { display: flex; gap: 10px; align-items: flex-start; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, var(--surface-2), #151935); color: var(--ink); }
+.sphcard:hover { border-color: var(--gold-dark); text-decoration: none; }
+.sphcard img { flex: none; }
+.sphcard .nm { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.sphcard .tag.gold { background: var(--gold-wash); color: var(--gold-light); }
+.sphcard p { margin: 4px 0 0; font-size: 12px; color: var(--ink-2); }
+.sphneed { margin: 0 0 8px; padding: 6px 10px; border-left: 3px solid var(--gold); background: var(--gold-wash); border-radius: 0 6px 6px 0; }
+.sph.sug { color: var(--gold-light); font-size: 13px; }

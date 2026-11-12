@@ -129,6 +129,7 @@ async function renderUnitPage(view, id) {
   if (u) {
     const r = unitRoles(u);
     body.append(h('div', { class: 'row' }, [...r.roles].map(k => h('span', { class: 'chip static on' }, ROLE_DEFS.find(d => d.key === k).label)), r.hits ? h('span', { class: 'chip static' }, `${r.hits} hits`) : null));
+    body.append(sphereSection(id, u));
     const skill = (label, s) => s && s.name ? h('div', { class: 'skill' }, h('b', {}, label + ' '), h('span', { class: 'nm' }, s.name), s.bc ? h('span', { class: 'faint' }, ` · ${s.bc[0]} BC`) : null, h('p', {}, s.desc)) : null;
     body.append(h('h2', {}, 'Skills'), skill('LS', u.ls), skill('ES', u.es), skill('BB', u.bb), skill('SBB', u.sbb), skill('UBB', u.ubb));
     if (u.imps) body.append(h('p', { class: 'faint' }, `Imp caps: HP ${u.imps[0]} · ATK ${u.imps[1]} · DEF ${u.imps[2]} · REC ${u.imps[3]}`));

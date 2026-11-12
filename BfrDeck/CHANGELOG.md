@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 (2026-11-12)
+
+- **Suggested spheres.** Every unit page shows two spheres picked by the deck: a sphere its Extra Skill names comes first (it switches the ES on), the rest are chosen by what the unit does (attack, spark, crit, BB gauge, survival), only from spheres with a known source in Revived, each with a short reason and how to get it. An Extra Skill that asks for a sphere type is pointed out. In the Team Builder the new ✦ button next to the two sphere slots fills the empty ones with the suggestion.
+- Unit pages link to the unit's page on BF Companion (spheres and SP builds).
+
 ## 1.2.0 (2026-11-12)
 
 - **The deck updates itself.** On start (and every six hours while open) it asks the GitHub releases page for a newer version. When there is one, a bar under the tabs names it, says what is new and how big the download is, with **Update** and **Later**. Most updates only touch the deck's pages: those are under 1 MB, install in a second and reload the deck in place. When the program itself changed, the button reads **Update and restart**: the new `BfrDeck.exe` is downloaded, checked against its checksum, swapped in and started. A failed download changes nothing and offers "Try again" or the download page. Your box, squads and notes are never touched. The Guide's last line shows the version with "Check for updates". Versions before 1.2.0 need this one download by hand.

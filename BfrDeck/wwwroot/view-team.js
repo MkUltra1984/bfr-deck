@@ -76,7 +76,13 @@ function renderTeam(view) {
           sid ? h('img', { src: itemIcon(sid), alt: '', width: 22, height: 22 }) : h('span', { class: 'plus' }, '+')); };
       cell.append(h('a', { class: 'portrait', href: `#/units/${id}`, title: `${unitName(id)} · cost ${m[0] ?? '?'} · ${rarityName(Math.min(unitRarity(id), 8))}` }, h('img', { src: unitIcon(id), alt: '' })),
         h('div', { class: 'n' }, unitName(id)),
-        h('div', { class: 'spheres' }, h('span', { class: 'faint' }, 'spheres'), sphereBtn(0), sphereBtn(1)),
+        h('div', { class: 'spheres' }, h('span', { class: 'faint' }, 'spheres'), sphereBtn(0), sphereBtn(1),
+          // fills the empty sphere slots with the deck's two suggestions for this unit (spheres.js)
+          h('button', { class: 'sph sug', title: 'Suggest spheres for this unit (fills the empty slots)', 'aria-label': 'Suggest spheres', onclick: async () => {
+            const r = suggestSpheres(id, await unitDetail(id)), arr = s.spheres[slot] || [null, null], free = r.picks.map(p => p.sphere.id).filter(x => !arr.includes(x));
+            if (!free.length || (arr[0] && arr[1])) { toast(arr[0] && arr[1] ? 'Both slots are filled. Right-click a sphere to clear it.' : 'No suggestion for this unit'); return; }
+            for (let k = 0; k < 2; k++) if (!arr[k] && free.length) arr[k] = free.shift();
+            s.spheres[slot] = arr; COLL.save(); renderTeam(view); toast(`Suggested: ${arr.filter(Boolean).map(x => itemRow(x)[0]).join(' + ')}`); } }, '✦')),
         h('div', { class: 'actions' },
           h('button', { class: 'act', disabled: slot === 0 ? true : null, title: slot === 0 ? 'This unit is the leader' : 'Make leader', onclick: () => move(slot, 0) }, '★'),
           h('button', { class: 'act', title: 'Swap for another unit', onclick: async () => { const p = await pickUnit({ title: `Slot ${slot + 1}` }); if (p) setSlot(slot, p); } }, '⇄'),
@@ -93,7 +99,7 @@ function renderTeam(view) {
     return cell;
   };
   const slots = h('div', { class: 'slots six' }, s.units.map(slotCell), friendCell());
-  const help = h('p', { class: 'faint', style: 'margin:0 0 8px' }, 'Drag a card onto another to reorder. ★ makes a unit the leader, ⇄ swaps it, ✕ removes it. The two circles are its sphere slots. The friend lead only contributes its leader skill.');
+  const help = h('p', { class: 'faint', style: 'margin:0 0 8px' }, 'Drag a card onto another to reorder. ★ makes a unit the leader, ⇄ swaps it, ✕ removes it. The two circles are its sphere slots, ✦ fills them with a suggestion. The friend lead only contributes its leader skill.');
 
   // ---- analysis (async): totals, leader skills, buff matrix, gaps + suggestions
   const analysis = h('div', { class: 'box' }, h('span', { class: 'dim' }, 'Reading skills…'));
