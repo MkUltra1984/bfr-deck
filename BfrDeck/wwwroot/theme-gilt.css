@@ -210,3 +210,4 @@ p.gives { background: var(--surface-1); border-left-color: var(--gold); }
 .sqg { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
 .sqh { display: flex; gap: 8px; align-items: baseline; margin-bottom: 6px; }
 .chip.static.off { opacity: .55; }
+.spheasy { margin: 14px 0 2px; font-size: 14px; }

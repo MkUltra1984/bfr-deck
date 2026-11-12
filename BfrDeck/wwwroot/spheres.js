@@ -77,6 +77,18 @@ function sphereHow(id) {
   return 'craft in town';
 }
 
+// Easy to get early: it drops in quests, or it is crafted from materials that all drop (no token shops, no one-time
+// rewards of late content). Returns the way in a few words, or ''.
+// Only spheres up to ★5 with a recipe of at most 100,000 Karma: the ★6 and ★7 crafts need materials from trials and
+// raids, which drop but are not early content.
+function sphereEasy(id) {
+  const s = itemSources(id);
+  if (itemRow(id)[2] > 5) return '';
+  if (s.chest.length || s.hit.length) return 'quest drop';
+  if (s.recipe.some(r => r[1] <= 100000 && materials(r[2]).every(([m]) => itemHave(m) === Infinity))) return 'craft in town, materials drop';
+  return '';
+}
+
 function sphereList() {
   if (sphereCache) return sphereCache;
   const out = [];
@@ -84,7 +96,7 @@ function sphereList() {
     if (it[1] !== 3 || !it[2] || !it[4] || /[぀-ヿ一-鿿]/.test(it[4]) || /-\d+%/.test(it[4])) continue;
     const how = sphereHow(Number(id));
     const p = sphereParts(it[4]);
-    out.push({ id: Number(id), name: it[0], rarity: it[2], desc: it[4], f: p.f, only: p.only, how, type: SPHERE_TYPE[id] || '' });
+    out.push({ id: Number(id), name: it[0], rarity: it[2], desc: it[4], f: p.f, only: p.only, how, easy: sphereEasy(Number(id)), type: SPHERE_TYPE[id] || '' });
   }
   return sphereCache = out;
 }
@@ -137,7 +149,14 @@ function suggestSpheres(id, u) {
     picks.push({ sphere: s, why: why(s), es: false });
   }
   for (const [s] of pool) { if (picks.length >= 2) break; if (!picks.some(p => p.sphere.id === s.id || sameType(p.sphere, s))) picks.push({ sphere: s, why: why(s), es: false }); }
-  return { picks, wish, needs, focus };
+  // two more that a new player can get early, when the best ones are not easy themselves
+  const easy = [];
+  if (picks.some(p => !p.sphere.easy)) for (const [s] of pool) {
+    if (easy.length >= 2) break;
+    if (!s.easy || picks.some(p => p.sphere.id === s.id) || easy.some(p => p.sphere.name === s.name || sameType(p.sphere, s))) continue;
+    easy.push({ sphere: s, why: why(s), es: needs.types.includes(s.type) || needs.ids.includes(s.id), easy: true });
+  }
+  return { picks, wish, easy, needs, focus };
 }
 
 // the block on a unit's page
@@ -147,13 +166,14 @@ function sphereSection(id, u) {
   const card = p => h('a', { class: 'sphcard', href: `#/items/${p.sphere.id}`, title: p.sphere.desc },
     h('img', { src: itemIcon(p.sphere.id), alt: '', width: 40, height: 40, loading: 'lazy' }),
     h('div', {}, h('div', { class: 'nm' }, p.sphere.name, h('span', { class: 'tag' }, `★${p.sphere.rarity}`), p.sphere.type ? h('span', { class: 'tag' }, p.sphere.type) : null, p.es ? h('span', { class: 'tag gold' }, 'switches on its ES') : null),
-      h('div', { class: 'faint' }, [p.why.join(' · '), p.sphere.how || 'not obtainable in Revived yet'].filter(Boolean).join(' · ')),
+      h('div', { class: 'faint' }, [p.why.join(' · '), p.easy ? p.sphere.easy : p.sphere.how || 'not obtainable in Revived yet'].filter(Boolean).join(' · ')),
       h('p', {}, p.sphere.desc)));
   return h('div', { class: 'sphbox' },
     h('h2', {}, 'Suggested spheres'),
     h('p', { class: 'faint', style: 'margin:0 0 8px' }, `Picked by the deck for what this unit does (${r.focus.label}), from spheres you can get in Revived.`),
     r.needs.types.length ? h('p', { class: 'sphneed' }, 'Its Extra Skill needs a ', h('b', {}, r.needs.types.join(' or ')), ' sphere.') : null,
     h('div', { class: 'sphcards' }, r.picks.map(card), r.wish ? card(r.wish) : null),
+    r.easy.length ? [h('h3', { class: 'spheasy' }, 'Easy to get early'), h('p', { class: 'faint', style: 'margin:0 0 8px' }, 'Not as strong, but they drop in quests or are crafted from materials that drop. Good until you can afford the ones above.'), h('div', { class: 'sphcards' }, r.easy.map(card))] : null,
     h('p', { style: 'margin:8px 0 0' }, h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', `https://bfcompanion.app/#/unit/${id}`); } }, 'Spheres and SP builds on BF Companion ›'), h('span', { class: 'faint' }, ' · sphere types from BF Companion')));
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4 (2026-11-12)
+
+- **Easy to get early:** under the two best spheres, unit pages show two that a new player can get: at most 5 stars, dropped in quests or crafted in town from materials that drop.
+
 ## 1.2.3 (2026-11-12)
 
 - **Suggestions tuned against players' builds.** Compared on a dozen well-known units with the players' SP builds from the wiki and BF Companion's sphere picks. SP builds now take the SBB's extra attack and the cheap stat, spark and elemental options first, keep leader skill options for lead builds, and skip PvP-only options. Sphere picks no longer overrate effects that only count at low HP or that are described with a big word instead of a number.
