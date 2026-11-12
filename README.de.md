@@ -144,3 +144,5 @@ Die Oberfläche ist reines HTML und JavaScript in `BfrDeck/wwwroot` ohne Build-S
 > Makros, veränderte Clients, veränderte Emulatoren und Cheat-Tools sind auf BF Revived **verboten**. BFR Deck bleibt auf der richtigen Seite dieser Linie: öffentliche Daten, ein Bild des Bildschirms, keine Eingaben, kein Speicher, kein Netzwerkverkehr. Bitte auch in Forks so halten.
 
 **MIT**, siehe [LICENSE](LICENSE). Brave Frontier und alle Spielgrafiken, Einheitennamen und Daten gehören ihren jeweiligen Eigentümern (gumi / Alim); Brave Frontier Revived ist ein Fanprojekt auf bfrevive.net. Dieser Begleiter steht mit keinem von ihnen in Verbindung.
+
+**Danke** an [BF Companion](https://bfcompanion.app/) (Nervequakes): Die Sphären-Typen, die das Deck für seine Sphären-Vorschläge nutzt, stammen aus dessen Daten, und jede Einheitenseite verlinkt dort auf die Einheit.

@@ -144,3 +144,5 @@ The UI is plain HTML and JavaScript in `BfrDeck/wwwroot` with no build step: edi
 > Macros, modified clients, modified emulators and cheat tools are **banned** on BF Revived. BFR Deck stays on the right side of that line: public data, a picture of the screen, no input, no memory, no traffic. Keep it that way in forks.
 
 **MIT**, see [LICENSE](LICENSE). Brave Frontier and all game artwork, unit names and data belong to their respective owners (gumi / Alim); Brave Frontier Revived is a fan project at bfrevive.net. This companion is not affiliated with any of them.
+
+**Thanks** to [BF Companion](https://bfcompanion.app/) (Nervequakes): the sphere types the deck uses for its sphere suggestions come from its data, and every unit page links to that unit there.

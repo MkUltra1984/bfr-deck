@@ -5,13 +5,17 @@
 //      survival ...), and the unit's skills say how much each of them is worth to it (unitRoles in roles.js).
 //   3. Only spheres with a known way to get them in Revived (drop, clear reward, shop, recipe), unless the ES names one.
 //   4. The second sphere must do something else than the first (the game also forbids two spheres of one type).
-// The game data has no sphere type (Spark, Atk Boosting, ...). An ES that asks for a type is shown as a hint.
+// Sphere types (Spark, Atk Boosting, ...) come from sphere-types.js: an ES that asks for a type gets the best sphere
+// of that type first, and the two picks are never of one type (the game forbids it).
 // Shown on the unit page (sphereSection) and offered in the Team Builder (suggestSpheres).
+// Suggested SP build (suggestSp, spSection): the unit's SP options scored the same way, the best set within 100 SP.
 
 const SPH_WORDS = [['slightly', 20], ['considerably', 40], ['greatly', 50], ['hugely', 75], ['massively', 75], ['enormously', 100], ['fully', 100]];
 const SPH_LABEL = { atk: 'attack', spark: 'spark damage', crit: 'critical hits', elem: 'elemental damage', bbatk: 'BB attack', bulk: 'HP and defence', mitig: 'damage reduction', bb: 'BB gauge', heal: 'healing', guard: 'ailment and KO protection', od: 'OD gauge' };
 const SPH_ELEMENTS = ['fire', 'water', 'earth', 'thunder', 'light', 'dark'];
-const SPH_TYPE_KEYS = [[/spark/i, 'spark'], [/atk|attack/i, 'atk'], [/critical/i, 'crit'], [/damage reduc/i, 'mitig'], [/BB gauge/i, 'bb'], [/HP recovery/i, 'heal'], [/status boost/i, 'bulk']];
+// how an Extra Skill words a sphere type -> the type's name in sphere-types.js
+const SPH_TYPE_WORDS = [[/spark/i, 'Spark'], [/atk boost|attack boost/i, 'Atk Boosting'], [/critical/i, 'Critical'], [/damage reduc/i, 'Damage Reduction'], [/BB gauge/i, 'BB Gauge'], [/HP recovery/i, 'HP Recovery'],
+  [/status boost/i, 'Status Boost'], [/ailment resist/i, 'Ailment Resist'], [/status ailment|ailment inflict/i, 'Status Ailment'], [/drop/i, 'Drop'], [/def(ense)? ignor/i, 'Def Ignore'], [/reflect/i, 'Damage Reflect'], [/target/i, 'Expose Target']];
 let sphereCache = null;
 
 // a sphere's effect text as strengths, e.g. { atk: 2, spark: 4, bb: 1 }; `only` lists elements it is limited to
@@ -56,7 +60,7 @@ function sphereList() {
     const src = itemSources(Number(id));
     const how = src.recipe.length ? 'craft' : src.shop.length ? 'shop' : src.clear.length ? 'clear reward' : src.chest.length || src.hit.length ? 'quest drop' : '';
     const p = sphereParts(it[4]);
-    out.push({ id: Number(id), name: it[0], rarity: it[2], desc: it[4], f: p.f, only: p.only, how });
+    out.push({ id: Number(id), name: it[0], rarity: it[2], desc: it[4], f: p.f, only: p.only, how, type: SPHERE_TYPE[id] || '' });
   }
   return sphereCache = out;
 }
@@ -81,7 +85,7 @@ function esSphereNeeds(u) {
       part = part.replace(/^(an?|the)\s+/i, '').trim(); if (!part) continue;
       const n = norm(part.replace(/\s+sphere$/i, '')), hit = sphereList().find(s => norm(s.name) === n || norm(s.name) === norm(part));
       if (hit) ids.push(hit.id);
-      else if (/sphere/i.test(part)) types.push(part.replace(/\s*type\s*/i, ' ').replace(/\s+/g, ' ').replace(/sphere$/i, 'sphere'));
+      else if (/sphere/i.test(part)) { const t = SPH_TYPE_WORDS.find(([re]) => re.test(part)); types.push(t ? t[1] : part); }
     }
   }
   return { ids: [...new Set(ids)], types: [...new Set(types)] };
@@ -90,8 +94,6 @@ function esSphereNeeds(u) {
 // { picks: [{ sphere, why: [labels], es: bool }], wish, needs, focus }: two spheres for the unit (detail `u` from unitDetail)
 function suggestSpheres(id, u) {
   const all = sphereList(), focus = sphereFocus(u), needs = esSphereNeeds(u), el = (ELEMENTS[unitElement(id)] || '').toLowerCase();
-  // an ES that asks for a sphere type: lean towards spheres that do what that type does (the type itself is unknown)
-  for (const t of needs.types) for (const [re, k] of SPH_TYPE_KEYS) if (re.test(t)) focus.w[k] *= 2.5;
   const fit = s => { if (s.only && el && !s.only.includes(el)) return 0; let t = 0; for (const [k, v] of Object.entries(s.f)) t += v * (focus.w[k] || 0); return t; };
   const why = s => Object.entries(s.f).map(([k, v]) => [k, v * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1]).slice(0, 2).filter(x => x[1] > 0).map(x => SPH_LABEL[x[0]]);
   const main = s => (Object.entries(s.f).map(([k, v]) => [k, v * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1])[0] || [''])[0];
@@ -102,12 +104,15 @@ function suggestSpheres(id, u) {
   const wish = wishS ? { sphere: wishS, why: why(wishS), es: true } : null;
   if (named) picks.push({ sphere: named, why: why(named), es: true });
   const pool = all.filter(s => s.how && (!named || s.id !== named.id)).map(s => [s, fit(s)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1] || b[0].rarity - a[0].rarity || a[0].id - b[0].id);
+  // no named sphere to be had, but the ES accepts a type: the best sphere of that type switches it on
+  if (!named && needs.types.length) { const t = pool.find(([s]) => needs.types.includes(s.type)); if (t) picks.push({ sphere: t[0], why: why(t[0]), es: true }); }
+  const sameType = (a, b) => a.type && a.type === b.type;
   for (const [s] of pool) {
     if (picks.length >= 2) break;
-    if (picks.some(p => main(p.sphere) === main(s) || p.sphere.name === s.name)) continue;
+    if (picks.some(p => p.sphere.id === s.id || p.sphere.name === s.name || sameType(p.sphere, s) || (!s.type && main(p.sphere) === main(s)))) continue;
     picks.push({ sphere: s, why: why(s), es: false });
   }
-  for (const [s] of pool) { if (picks.length >= 2) break; if (!picks.some(p => p.sphere.id === s.id)) picks.push({ sphere: s, why: why(s), es: false }); }
+  for (const [s] of pool) { if (picks.length >= 2) break; if (!picks.some(p => p.sphere.id === s.id || sameType(p.sphere, s))) picks.push({ sphere: s, why: why(s), es: false }); }
   return { picks, wish, needs, focus };
 }
 
@@ -117,13 +122,49 @@ function sphereSection(id, u) {
   if (!r.picks.length) return null;
   const card = p => h('a', { class: 'sphcard', href: `#/items/${p.sphere.id}`, title: p.sphere.desc },
     h('img', { src: itemIcon(p.sphere.id), alt: '', width: 40, height: 40, loading: 'lazy' }),
-    h('div', {}, h('div', { class: 'nm' }, p.sphere.name, h('span', { class: 'tag' }, `★${p.sphere.rarity}`), p.es ? h('span', { class: 'tag gold' }, 'switches on its ES') : null),
+    h('div', {}, h('div', { class: 'nm' }, p.sphere.name, h('span', { class: 'tag' }, `★${p.sphere.rarity}`), p.sphere.type ? h('span', { class: 'tag' }, p.sphere.type) : null, p.es ? h('span', { class: 'tag gold' }, 'switches on its ES') : null),
       h('div', { class: 'faint' }, [p.why.join(' · '), p.sphere.how || 'not obtainable in Revived yet'].filter(Boolean).join(' · ')),
       h('p', {}, p.sphere.desc)));
   return h('div', { class: 'sphbox' },
     h('h2', {}, 'Suggested spheres'),
     h('p', { class: 'faint', style: 'margin:0 0 8px' }, `Picked by the deck for what this unit does (${r.focus.label}), from spheres you can get in Revived.`),
-    r.needs.types.length ? h('p', { class: 'sphneed' }, 'Its Extra Skill needs a ', h('b', {}, r.needs.types.join(' or ')), '. The deck cannot see sphere types yet: it leans towards spheres of that kind, check the type in game before you equip.') : null,
+    r.needs.types.length ? h('p', { class: 'sphneed' }, 'Its Extra Skill needs a ', h('b', {}, r.needs.types.join(' or ')), ' sphere.') : null,
     h('div', { class: 'sphcards' }, r.picks.map(card), r.wish ? card(r.wish) : null),
-    h('p', { style: 'margin:8px 0 0' }, h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', `https://bfcompanion.app/#/unit/${id}`); } }, 'Spheres and SP builds on BF Companion ›')));
+    h('p', { style: 'margin:8px 0 0' }, h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', `https://bfcompanion.app/#/unit/${id}`); } }, 'Spheres and SP builds on BF Companion ›'), h('span', { class: 'faint' }, ' · sphere types from BF Companion')));
+}
+
+// ---- SP build -------------------------------------------------------------------------------------------------
+// The unit's SP options (unitDetail().sp) scored like a sphere's effect text, by what the unit does; an effect added
+// to a BB/SBB/UBB or the leader skill counts more than a passive, because the whole squad gets it. The best set within
+// 100 SP wins (fewer SP on a tie); an option that needs another one (`needs`) only comes together with it.
+const SP_BUDGET = 100;
+function suggestSp(id, u) {
+  const opts = [];
+  for (const cat of (u && u.sp) || []) for (const s of cat.skills || []) opts.push({ id: s.id, cat: cat.cat, name: s.name, desc: s.desc || '', sp: s.sp || 0, needs: s.needs });
+  if (!opts.length || opts.length > 22) return null;
+  const focus = sphereFocus(u);
+  for (const o of opts) {
+    const text = `${o.name} ${o.desc}`, f = sphereParts(text).f;
+    let v = 0; for (const [k, x] of Object.entries(f)) v += Math.min(x, 6) * (focus.w[k] || 0);
+    if (/\b(BB|SBB|UBB|LS|Leader Skill)\b/.test(text)) v *= 1.4;
+    o.value = Math.max(v, 0.3);
+    o.why = (Object.entries(f).map(([k, x]) => [k, x * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1])[0] || [])[0];
+  }
+  const index = new Map(opts.map((o, i) => [String(o.id), i]));
+  const need = opts.map(o => [].concat(o.needs == null ? [] : o.needs).map(x => index.get(String(x))).filter(x => x != null));
+  let best = 0, bestV = -1, bestSp = 0;
+  for (let mask = 1; mask < (1 << opts.length); mask++) {
+    let sp = 0, v = 0, ok = true;
+    for (let i = 0; i < opts.length && ok; i++) if (mask & (1 << i)) { sp += opts[i].sp; v += opts[i].value; if (sp > SP_BUDGET || need[i].some(j => !(mask & (1 << j)))) ok = false; }
+    if (ok && (v > bestV + 1e-9 || (Math.abs(v - bestV) < 1e-9 && sp < bestSp))) { best = mask; bestV = v; bestSp = sp; }
+  }
+  return { picks: opts.filter((_, i) => best & (1 << i)), sp: bestSp, total: opts.length };
+}
+function spSection(id, u) {
+  const r = suggestSp(id, u);
+  if (!r || !r.picks.length) return null;
+  return h('div', { class: 'spbox' },
+    h('h2', {}, 'Suggested SP build'),
+    h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options, picked by the deck for what this unit does. Players' own builds: BF Companion link above.`),
+    h('ul', { class: 'splist' }, r.picks.map(o => h('li', { title: o.desc || o.name }, h('span', { class: 'spc' }, `${o.sp} SP`), h('span', { class: 'grow' }, o.name), h('span', { class: 'faint' }, o.cat)))));
 }

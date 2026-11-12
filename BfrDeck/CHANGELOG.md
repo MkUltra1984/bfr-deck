@@ -2,8 +2,9 @@
 
 ## 1.2.1 (2026-11-12)
 
-- **Suggested spheres.** Every unit page shows two spheres picked by the deck: a sphere its Extra Skill names comes first (it switches the ES on), the rest are chosen by what the unit does (attack, spark, crit, BB gauge, survival), only from spheres with a known source in Revived, each with a short reason and how to get it. An Extra Skill that asks for a sphere type is pointed out. In the Team Builder the new ✦ button next to the two sphere slots fills the empty ones with the suggestion.
-- Unit pages link to the unit's page on BF Companion (spheres and SP builds).
+- **Suggested spheres.** Every unit page shows two spheres picked by the deck: a sphere its Extra Skill names comes first (it switches the ES on), the rest are chosen by what the unit does (attack, spark, crit, BB gauge, survival), only from spheres with a known source in Revived, each with a short reason and how to get it. When the Extra Skill asks for a sphere type (\"Spark sphere\"), the best sphere of that type leads, and the two picks are never of one type, as in the game. In the Team Builder the new ✦ button next to the two sphere slots fills the empty ones with the suggestion.
+- **Suggested SP build** on Omni unit pages: the unit's SP options scored by what the unit does, the best set within 100 SP.
+- Unit pages link to the unit's page on BF Companion (spheres and players' SP builds). The sphere types come from BF Companion's data; thank you.
 
 ## 1.2.0 (2026-11-12)
 
