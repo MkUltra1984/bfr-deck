@@ -1,122 +1,171 @@
-<p align="center">
-  <img src="docs/img/home.gif" alt="BFR Deck docked beside Brave Frontier Revived">
-</p>
-
 <h1 align="center">BFR Deck</h1>
 
 <p align="center">
-  <b>The desktop companion for <a href="https://bfrevive.net">Brave Frontier Revived</a>.</b><br>
-  Docks beside your emulator. Knows your box, your squads, every gate, dungeon and unit.
+  <b>A free desktop companion for <a href="https://bfrevive.net">Brave Frontier Revived</a>.</b><br>
+  It sits beside your emulator and knows your box, your squads, every gate, dungeon and unit.
 </p>
 
 <p align="center">
-  <a href="https://github.com/MkUltra1984/bfr-deck/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/MkUltra1984/bfr-deck?style=for-the-badge&color=e0b24a&labelColor=1d1f25&label=Download"></a>
-  <img alt="Windows" src="https://img.shields.io/badge/Windows_10%2F11-x64-6fa8dc?style=for-the-badge&labelColor=1d1f25">
-  <img alt="Read-only" src="https://img.shields.io/badge/Read--only-no_input%2C_no_memory%2C_no_traffic-6fc98a?style=for-the-badge&labelColor=1d1f25">
-  <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/License-MIT-e8e6df?style=for-the-badge&labelColor=1d1f25"></a>
+  <a href="https://github.com/MkUltra1984/bfr-deck/releases/latest"><img alt="Download the latest release" src="https://img.shields.io/github/v/release/MkUltra1984/bfr-deck?style=for-the-badge&color=e0b24a&labelColor=1d1f25&label=Download"></a>
+  <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows_10%2F11-x64-6fa8dc?style=for-the-badge&labelColor=1d1f25">
+  <img alt="Read-only" src="https://img.shields.io/badge/Read--only-6fc98a?style=for-the-badge&labelColor=1d1f25">
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-e8e6df?style=for-the-badge&labelColor=1d1f25"></a>
 </p>
 
 <p align="center">
-  <a href="README.de.md">🇩🇪 Deutsche Anleitung</a> &nbsp;·&nbsp; <a href="BfrDeck/CHANGELOG.md">📋 Changelog</a> &nbsp;·&nbsp; <a href="https://github.com/MkUltra1984/bfr-deck/issues">🐛 Report a problem</a>
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="BfrDeck/CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/MkUltra1984/bfr-deck/issues">Report a problem</a>
 </p>
 
----
+![BFR Deck home screen: reset timers, your squad, Should I pull, featured units](docs/img/show/home.png)
 
-## ⬇️ Install
+## In short
 
-**1.** Download `BfrDeck-win-x64.zip` from the [latest release](https://github.com/MkUltra1984/bfr-deck/releases/latest) and unzip it anywhere.
-**2.** Double-click `BfrDeck.exe`. Nothing else to install.
-**3.** That was the last download: from version 1.2.0 the deck updates itself. When a new version is out, a bar under the tabs offers it; one click installs it.
+- **What it is:** a small Windows program with seven tabs: Home, Units, Tier List, Summon, Quests, Team Builder and a beginner Guide.
+- **Who it is for:** new and returning players who want answers without digging: should I pull, what is open today, who is missing in my squad.
+- **Read-only:** it reads the public data of bfrevive.net and, only if you switch it on, a picture of your emulator window. No input, no memory reading, no network sniffing.
+- **Free and open:** MIT license, the complete source is in this repository.
+
+**On this page:** [Install](#install) · [What it does](#what-it-does) · [For the BFR team and reviewers](#for-the-bfr-team-and-reviewers) · [Build from source](#build-from-source) · [Credits and license](#credits-and-license)
+
+## Install
+
+1. Download `BfrDeck-win-x64.zip` from the [latest release](https://github.com/MkUltra1984/bfr-deck/releases/latest) and unzip it anywhere.
+2. Double-click `BfrDeck.exe`. There is nothing else to install.
+3. That was the last download. When a new version is out, a bar under the tabs offers it and one click installs it.
 
 > [!IMPORTANT]
-> Windows SmartScreen warns once because the exe is not code-signed. Click **More info → Run anyway**. The complete source is in this repository; build it yourself if you prefer.
+> Windows SmartScreen warns once because the file is not code-signed. Click **More info → Run anyway**. If you prefer, build it yourself from the source below.
 
-> [!NOTE]
-> **Read-only by design.** The deck reads the public data of bfrevive.net and, only if you turn it on, a picture of your emulator window. It never sends input, never reads memory, never touches network traffic. Nothing the server rules forbid.
+## What it does
 
-## 🏠 Home
+### Home
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/header.png" alt="Live header"><br>🔴 <b>Live header</b> · your name, <b>gems, Zel and Karma</b> read from the game screen. <b>Reset timers</b> for dailies, the Vortex day and the weekly selector.</td>
-<td width="50%" valign="top"><img src="docs/img/feat/squad.png" alt="Squad stage"><br>⚔️ <b>Your squad</b> · the real <b>battle sprites</b> on element-lit platforms, with cost, elements and leader skill. Filled by the unit scan.</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/feat/pull.png" alt="Should I pull"><br>🎲 <b>Should I pull?</b> · odds per rarity, how much of the gate you <b>already own</b>, gems per new unit, the gate's <b>Meta Units</b>. <b>I pulled…</b> logs a summon session in one go.</td>
-<td valign="top"><img src="docs/img/feat/featured.png" alt="Featured units"><br>✨ <b>Featured this week</b> · the collab and rate-up units walk past; drag to browse.<br><br><img src="docs/img/feat/banners.png" alt="Banners"><br>🎫 <b>Banners</b> · this week's gates with price and time left, next week's below.</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><img src="docs/img/feat/vortex-tile.png" alt="Vortex Gate tile"><br>🌀 <b>Vortex Gate</b> · the week as day chips, one card per open dungeon with <b>what it gives in plain words</b> and its captures or drops as pictures. A card opens the dungeon page.</td>
-</tr>
-</table>
+- **Reset timers** for dailies, the Vortex day and the weekly selector.
+- **Your squad** with the real battle sprites, cost, elements and leader skill.
+- **Should I pull?** gives a verdict for each open gate against the units you already own, with the odds one click away.
+- **Featured this week** and the current banners with their time left.
+- With live stats on, the header shows your gems, Zel and Karma, read from a picture of the game screen.
 
-## 🧩 Units
+### Units and unit pages
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/units.png" alt="Units"><br>🔍 <b>Units</b> · search with typo tolerance, element and rarity filters, cards or table. <b>✔ owned</b>, <b>★ bookmarked</b>.</td>
-<td width="50%" valign="top"><img src="docs/img/feat/unit-page.png" alt="Unit page"><br>📄 <b>Unit page</b> · animated sprite, stats, roles, every skill, and <b>where to get it</b>: gates with rates, quests with capture chance.</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/feat/box.png" alt="Box"><br>📦 <b>Box</b> · your collection with progress per rarity and element. Rescan after selling or fusing.</td>
-<td valign="top"><img src="docs/img/feat/tier.png" alt="Tier List"><br>🏆 <b>Tier List</b> · every unit <b>S to C</b> by max stats and the roles its skills cover. Filter by element, rarity, role, or owned only.</td>
-</tr>
-</table>
+![Unit page with suggested spheres and SP build](docs/img/show/unit-page.png)
 
-## 🎰 Summon and Quests
+- Search with typo tolerance, filter by element and rarity, mark units as owned or bookmarked.
+- Each unit page shows the animated sprite, stats, roles, every skill, the evolution line and where to get the unit.
+- **Suggested spheres:** two per unit. The sphere or sphere type its Extra Skill asks for comes first, and only spheres you can really get in Revived are named, with their source.
+- **Suggested SP build** for Omni units, within 100 SP.
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/summon.png" alt="Summon"><br>🎰 <b>Summon</b> · this week, next week, the always-open gates and the rotation with dates.</td>
-<td width="50%" valign="top"><img src="docs/img/feat/gate-page.png" alt="Gate page"><br>💎 <b>Gate page</b> · the <b>verdict against your box</b>, chances per rarity, the full pool with owned marks.</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/feat/quests.png" alt="Quests"><br>🗺️ <b>Quests</b> · the whole Vortex Gate as a catalog, plus Grand Quest, Story, Frontier Hunter, Frontier Gate and Trials, each with <b>what it gives</b>.</td>
-<td valign="top"><img src="docs/img/feat/dungeon.png" alt="Dungeon page"><br>🏰 <b>Dungeon page</b> · what it gives, then every level with <b>captures and their chance</b>, drops per kill, enemies.</td>
-</tr>
-</table>
+<details>
+<summary>Picture: the unit list</summary>
 
-## 🛡️ Team Builder
+![Unit list](docs/img/show/units.png)
+</details>
 
-<table>
-<tr>
-<td colspan="2" valign="top"><img src="docs/img/feat/team-slots.png" alt="Slots"><br>🃏 <b>Six slots</b> · five units and the friend lead. <b>★</b> leader, <b>⇄</b> swap, <b>✕</b> remove, drag to reorder, two spheres per slot.</td>
-</tr>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/team-matrix.png" alt="Buff matrix"><br>📊 <b>Who brings what</b> · totals, both leader skills, and a matrix of healing, mitigation, BB fill and buffs per slot. <b>Missing effects are marked.</b></td>
-<td width="50%" valign="top"><img src="docs/img/feat/team-gaps.png" alt="Fill the gaps"><br>🧠 <b>Fill the gaps</b> · the best units <b>from your box</b> for each missing effect; one click puts them in. Share a squad with a <b>team code</b>.</td>
-</tr>
-</table>
+### Tier List
 
-## 📖 Beginner guide
+![Tier list](docs/img/show/tier.png)
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/guide.png" alt="First steps"><br>✅ <b>Six first steps</b> · link the account, claim the gems, story, selectors, one finished team, the daily loop. Tick them off; the deck remembers. An <b>Every day</b> checklist resets at 00:00 UTC.</td>
-<td width="50%" valign="top"><img src="docs/img/feat/guide-cards.png" alt="Topic cards"><br>🗂️ <b>One card per topic</b> · currencies, frogs, evolution, imps, spheres, farming days, summons, getting help. Each opens its own short page. <b>Every game term</b> in the deck explains itself on hover.</td>
-</tr>
-</table>
+- Every unit ranked S to C by its maximum stats and by what its skills bring to a squad.
+- Filter by element, rarity, role, or only the units you own.
+- It is a formula, and the page says so: a unit with a niche leader skill can matter more than its tier.
 
-## 🚀 First start
+### Summon and Quests
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/feat/intro.png" alt="Welcome"><br>👋 <b>Welcome and tour</b> · one card per tab and panel, shown over the real thing. Replay it from the Box page.</td>
-<td width="50%" valign="top"><img src="docs/img/feat/tour.png" alt="Tour card"><br>🎯 <b>Tour card</b> · the panel it describes is scrolled into view and <b>outlined in gold</b>.</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/feat/scan.png" alt="Unit scanner"><br>📷 <b>Unit scanner</b> · open the unit list in the game and scroll. The deck watches the emulator window, snaps a grid to the rows, <b>matches every icon</b> and reads the ×N stacks. The yellow PARTY ribbon becomes Squad 1. <b>No calibration, any emulator.</b></td>
-<td valign="top"><img src="docs/img/feat/quick-add.png" alt="I pulled"><br>➕ <b>I pulled…</b> · after a summon session tick what you got from the gate's pool. <b>Done</b> adds it to your box.</td>
-</tr>
-</table>
+![Summon tab](docs/img/show/summon.png)
 
-## 🪟 Docked
+- **Summon:** this week's gates, next week's, the always-open gates and the rotation with dates. A gate page shows the chances per rarity and the full pool with your owned units marked.
+- **Quests:** the Vortex Gate as a catalog, plus Grand Quest, Story, Frontier Hunter, Frontier Gate and Trials, each with what it gives. A dungeon page lists captures with their chance, drops and enemies.
 
-<img src="docs/img/docked.png" alt="BFR Deck docked beside BlueStacks">
+<details>
+<summary>Picture: the Quests tab</summary>
 
-**Dock** snaps the deck to the emulator's side and keeps the two together when either moves. **BlueStacks, LDPlayer, Nox, MEmu, MuMu, GameLoop** and the Android Studio emulator are recognised; for anything else hold <kbd>Shift</kbd>, click Dock, click the emulator. **Pin** keeps the deck on top.
+![Quests tab](docs/img/show/quests.png)
+</details>
 
-## ⌨️ Command line
+### Team Builder
+
+![Team Builder with the squad check](docs/img/show/team.png)
+
+- Five units and a friend lead, two spheres per slot, drag to reorder. The ✦ button fills empty sphere slots with a suggestion.
+- **Squad check:** what your squad covers for damage, survival and support, and what is missing.
+- **Who brings what:** a table of every buff and the skill that brings it.
+- **Fill the gaps:** the best units from your own box for each missing effect. Share a squad as a short team code.
+
+### Beginner guide
+
+![Guide tab](docs/img/show/guide.png)
+
+- Six first steps with checkboxes, and a daily checklist that resets at 00:00 UTC.
+- One short page per topic: currencies, frogs, evolution, imps, spheres, farming days, summons.
+- Game terms anywhere in the deck explain themselves when you hover over them.
+
+### Unit scanner
+
+![Unit scanner](docs/img/show/scan.png)
+
+- Open the unit list in the game and scroll. The deck watches a picture of the emulator window, matches every icon and reads the ×N stacks.
+- No calibration, and it works with any emulator. Your main party becomes Squad 1.
+- No captured frame stays on disk.
+
+### Docked beside the emulator
+
+![BFR Deck docked beside BlueStacks](docs/img/show/docked.png)
+
+- **Dock** snaps the deck to the emulator's side and keeps the two together when either moves. **Pin** keeps it on top.
+- BlueStacks, LDPlayer, Nox, MEmu, MuMu, GameLoop and the Android Studio emulator are recognised. For anything else hold <kbd>Shift</kbd>, click Dock, then click the emulator.
+- This picture is from an earlier version; the deck now has the indigo and gold look of the other pictures. [See it in motion (GIF, 24 MB)](docs/img/home.gif).
+
+### Updates itself
+
+![The update bar](docs/img/show/update.png)
+
+- The deck checks the GitHub releases page when it starts. Nothing installs without your click.
+- Most updates are under 1 MB and take a second. Your box, squads and notes are never touched.
+
+## For the BFR team and reviewers
+
+**What the deck reads**
+
+| Source | What | How often |
+|---|---|---|
+| `bfrevive.net/data/units.json`, `items.json`, `summons.json`, `events.json` and `/units/meta.json` | the public data feeds | cached on disk for 3 hours |
+| `bfrevive.net/units/u/<id>.json` | one unit's skills, when its page is opened or a list needs it | cached on disk |
+| `cdn.bfrevive.net` | unit icons, sprites, item and gate pictures | cached for 14 days, 300 MB at most |
+| the "BFRevived" and "Wiki" tabs | bfrevive.net and the Brave Frontier wiki, shown in an embedded browser like any browser would | only when you open them |
+| the emulator window (optional) | a picture of the screen for live stats and the unit scanner, read with Windows' own text recognition | only while switched on |
+| `github.com/MkUltra1984/bfr-deck` | the update check | at start and every 6 hours |
+
+Requests from the deck identify themselves as `BfrDeck/0.1 (+companion app; read-only)`. When the site cannot be reached, the deck shows its last good copy.
+
+**What the deck never does**
+
+- It sends no input to the game: no clicks, no macros, no automation.
+- It does not read or write the game's memory or files, and it does not touch the emulator or the APK.
+- It does not read, change or replay network traffic. It knows no account, password or token.
+- It collects nothing: no telemetry, no analytics, no server of its own. Your box and squads stay on your PC.
+
+**If something should change:** if the deck asks your servers too often, shows data you would rather not have shown, or words something wrongly, [open an issue](https://github.com/MkUltra1984/bfr-deck/issues) or tell me on the BFR Discord and I will change it.
+
+**Use it as you like:** the BFR team may take, change or build on anything in this repository, in whole or in part, without asking. The MIT license already allows it; this is the same thing said plainly.
+
+**How it was made:** the code was written by an AI coding assistant (Claude, by Anthropic) under my direction. The ideas, the feature decisions, the design choices and the testing in the game are mine; I read code and know my way around it, but I am not a professional developer. The whole source is open so anyone can check what it does.
+
+## Build from source
+
+<details>
+<summary>Steps and command line switches</summary>
+
+You need Windows 10 or 11 and the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0).
+
+```powershell
+cd BfrDeck
+dotnet build -c Release
+bin\Release\net9.0-windows10.0.19041.0\win-x64\BfrDeck.exe
+```
+
+The UI is plain HTML and JavaScript in `BfrDeck/wwwroot` with no build step: edit, press reload. `rules.js` holds the server-specific numbers. `tools\publish.ps1` produces the single exe, `tools\release.ps1` the release files. Code layout: [BfrDeck/README.md](BfrDeck/README.md).
 
 | Switch | Effect |
 |---|---|
@@ -125,24 +174,15 @@
 | `--ocrtest frame.png` | run the live-stats reader on a saved 1080×1920 frame and exit |
 
 Logs, cache and settings live in `%LOCALAPPDATA%\BfrDeck`.
+</details>
 
-## 🔧 Build from source
-
-Windows 10/11 and the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0).
-
-```powershell
-cd BfrDeck
-dotnet build -c Release
-bin\Release\net9.0-windows10.0.19041.0\win-x64\BfrDeck.exe
-```
-
-The UI is plain HTML and JavaScript in `BfrDeck/wwwroot` with no build step: edit, press reload. `rules.js` holds the server-specific numbers. `tools\publish.ps1` produces the single exe. Code layout: [BfrDeck/README.md](BfrDeck/README.md).
-
-## ⚖️ Server rules and license
+## Credits and license
 
 > [!WARNING]
-> Macros, modified clients, modified emulators and cheat tools are **banned** on BF Revived. BFR Deck stays on the right side of that line: public data, a picture of the screen, no input, no memory, no traffic. Keep it that way in forks.
+> Macros, modified clients, modified emulators and cheat tools are banned on BF Revived. BFR Deck stays on the right side of that line. Please keep it that way in forks.
 
-**MIT**, see [LICENSE](LICENSE). Brave Frontier and all game artwork, unit names and data belong to their respective owners (gumi / Alim); Brave Frontier Revived is a fan project at bfrevive.net. This companion is not affiliated with any of them.
-
-**Thanks** to [BF Companion](https://bfcompanion.app/) (Nervequakes): the sphere types the deck uses for its sphere suggestions come from its data, and every unit page links to that unit there.
+- **License:** MIT, see [LICENSE](LICENSE).
+- **The game:** Brave Frontier and all game artwork, unit names and data belong to their owners (gumi / Alim). Brave Frontier Revived is a fan project at bfrevive.net. This companion is not affiliated with any of them.
+- **Thanks to the BFR team** for bringing the game back and publishing its data.
+- **Thanks to [BF Companion](https://bfcompanion.app/)** (Nervequakes): the sphere types behind the sphere suggestions come from its data, and every unit page links to that unit there.
+- **Thanks to WhiteHikari:** the squad check follows the structure of the community guide "Brave Frontier Unit Viability & Squad Building".
