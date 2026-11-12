@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 (2026-11-12)
 
+- **The deck updates itself.** On start (and every six hours while open) it asks the GitHub releases page for a newer version. When there is one, a bar under the tabs names it, says what is new and how big the download is, with **Update** and **Later**. Most updates only touch the deck's pages: those are under 1 MB, install in a second and reload the deck in place. When the program itself changed, the button reads **Update and restart**: the new `BfrDeck.exe` is downloaded, checked against its checksum, swapped in and started. A failed download changes nothing and offers "Try again" or the download page. Your box, squads and notes are never touched. The Guide's last line shows the version with "Check for updates". Versions before 1.2.0 need this one download by hand.
 - **New look, "Midnight Gilt"**: Brave Frontier style, modernized. Indigo-navy panels with a thin gold frame, gold for highlights, crimson only for alerts, serif titles, a crest in the tab bar, 14 px body text with readable label sizes, currency icons on the Gems, Zel and Karma tiles, star ratings coloured by rarity with a soft glow on 7★ and Omni cards, and a pedestal picture in empty squad slots. Window frame and title bar match.
 - **Should I pull?** leads with the verdict; the odds table and the ownership bars open under "See odds and bars".
 - Team Builder says "not yet covered" instead of a red "missing".

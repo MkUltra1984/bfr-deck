@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BfrDeck</AssemblyName>
     <RootNamespace>BfrDeck</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>MkUltra1984</Authors>
     <Description>BFR Deck: a read-only desktop companion for Brave Frontier Revived.</Description>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -37,6 +37,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Key of the program's own source, set by tools\publish.ps1. The in-app update compares it with the release's
+         key: equal means only the web part changed (see Updater.cs). Empty in dev builds, which never update. -->
+    <AssemblyMetadata Include="HostKey" Value="$(HostKey)" />
   </ItemGroup>
 
   <ItemGroup>

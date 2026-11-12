@@ -174,3 +174,16 @@ p.gives { background: var(--surface-1); border-left-color: var(--gold); }
 .toast { background: linear-gradient(180deg, #2a2414, #1f1a0e); color: var(--gold-light); border-color: var(--gold); box-shadow: 0 8px 24px rgba(2,3,12,.6); }
 .scanwarn { background: rgba(180,35,52,.18); border-color: var(--crimson-text); color: var(--crimson-text); }
 .scan canvas.frame, canvas.calib { border-color: var(--line-gold); }
+
+/* update bar under the tabs (update.js) */
+#updbar { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: linear-gradient(180deg, #2a2414, #1f1a0e); border-bottom: 1px solid var(--line-gold); color: var(--ink); font-size: 13px; }
+#updbar[hidden] { display: none; }
+#updbar b { color: var(--gold-light); white-space: nowrap; }
+#updbar .msg { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+#updbar .num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#updbar button { white-space: nowrap; padding: 3px 12px; }
+#updbar.busy .bar { flex: 1; height: 8px; border-radius: 4px; overflow: hidden; }
+#updbar.busy .fill { height: 100%; transition: width .3s ease-out; }
+#updbar.bad { background: rgba(180,35,52,.18); border-bottom-color: var(--crimson-text); }
+#updbar.bad b { color: var(--crimson-text); }
+.updline { margin-top: 6px; }

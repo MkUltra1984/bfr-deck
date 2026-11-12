@@ -82,7 +82,8 @@ function renderGuide(view, id) {
       link('Summoner’s Handbook', 'https://docs.google.com/document/d/16rQMn6TITW1MWWM_ple0M-l0w4Kykm6ImFbYqpGizSA/preview', 'handbook', 'what to buy first, where to get currencies, spheres, elgifs (original game)'),
       link('Resources Management Guide 2021', 'https://docs.google.com/document/d/1NlW8f8qVPJ6H1UwfNdAWuOl4gBDN4z1FPzzEYmt510Q/preview', 'resources', 'what to keep and what to sell'),
       link('Wiki: detailed buff lists', 'https://bravefrontierglobal.fandom.com/wiki/Category:Detailed_Buff_Lists', 'wiki')))),
-    h('p', { class: 'faint', style: 'margin-top:14px' }, 'Written from the BF Revived Discord FAQ and beginner guide (Oct–Nov 2026). Live data: bfrevive.net. Not affiliated with the BFR team, gumi or Alim.')));
+    h('p', { class: 'faint', style: 'margin-top:14px' }, 'Written from the BF Revived Discord FAQ and beginner guide (Oct–Nov 2026). Live data: bfrevive.net. Not affiliated with the BFR team, gumi or Alim.'),
+    updLine()));
 }
 
 // One topic on its own page: back link, title, the content, then the neighbouring topics.

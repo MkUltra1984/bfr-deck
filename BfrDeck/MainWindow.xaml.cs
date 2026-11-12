@@ -29,7 +29,9 @@ public partial class MainWindow : Window
     private readonly Dictionary<string, RadioButton> _tabs = new();
     private readonly DataCache _cache = new();
     private readonly string _dataDir;
-    private readonly string _wwwroot;
+    private string _wwwroot;
+    private string? _webVersion;       // set when the UI comes from a web update (see Updater)
+    private readonly Updater _updater;
     private CoreWebView2Environment? _env;
     private string _current = "deck";
     private Settings _settings = new();
@@ -39,8 +41,9 @@ public partial class MainWindow : Window
         InitializeComponent();
         _dataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BfrDeck");
         Directory.CreateDirectory(_dataDir);
-        Housekeeping();
         _wwwroot = ResolveWwwroot();
+        Housekeeping();
+        _updater = new Updater(_dataDir, _webVersion, Log) { WebReady = UseWebUpdate, RestartReady = () => Dispatcher.Invoke(() => { if (_updater!.Restart()) Close(); }) };
         LoadSettings();
         foreach (var t in TabDefs)
         {
@@ -82,6 +85,8 @@ public partial class MainWindow : Window
     {
         var beside = Path.Combine(AppContext.BaseDirectory, "wwwroot");
         if (File.Exists(Path.Combine(beside, "index.html"))) return beside;
+        // a web update on top of this exe wins over the UI inside it
+        if (Updater.InstalledWeb(_dataDir) is { } web) { _webVersion = web.Version; return web.Dir; }
         // Keyed by version and build id (the module's MVID changes with every build), so a rebuilt exe of the same
         // version never serves a stale unpacked UI. Housekeeping removes the older folders.
         var asm = typeof(MainWindow).Assembly;
@@ -185,6 +190,18 @@ public partial class MainWindow : Window
         catch (Exception ex) { Log("devtools hook failed: " + ex.Message); }
     }
 
+    // A web update is unpacked: serve the deck from its folder and load it anew (no restart of the program).
+    private Task UseWebUpdate(string dir) => Dispatcher.InvokeAsync(async () =>
+    {
+        _wwwroot = dir;
+        if (!_views.TryGetValue("deck", out var wv) || wv.CoreWebView2 == null) return;
+        var core = wv.CoreWebView2;
+        core.SetVirtualHostNameToFolderMapping(DeckHost, dir, CoreWebView2HostResourceAccessKind.DenyCors);
+        try { await core.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}"); } catch { }
+        Log("deck reloading; wwwroot=" + dir);
+        core.Reload();
+    }).Task.Unwrap();
+
     private readonly object _logLock = new();
     private void Log(string line)
     {
@@ -225,6 +242,15 @@ public partial class MainWindow : Window
                 if (saveN != null) try { File.WriteAllBytes(Path.Combine(_dataDir, $"badge-{saveN}.png"), ms0.ToArray()); } catch { }
                 var text = await _live.OcrTextAsync(ms0.ToArray());
                 e.Response = Json(JsonSerializer.Serialize(new { text }));
+                return;
+            }
+            if (uri.AbsolutePath.StartsWith("/api/update"))
+            {
+                // /api/update: state; /check: ask the releases page; /apply: download and install in the background
+                // (the page polls /api/update for the progress; when done the host reloads the page or restarts)
+                if (uri.AbsolutePath == "/api/update/check") await _updater.Check();
+                else if (uri.AbsolutePath == "/api/update/apply") _ = Task.Run(_updater.Apply);
+                e.Response = Json(JsonSerializer.Serialize(_updater.Status()));
                 return;
             }
             if (uri.AbsolutePath.StartsWith("/api/"))

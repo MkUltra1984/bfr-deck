@@ -26,6 +26,7 @@
 
 **1.** Download `BfrDeck-win-x64.zip` from the [latest release](https://github.com/MkUltra1984/bfr-deck/releases/latest) and unzip it anywhere.
 **2.** Double-click `BfrDeck.exe`. Nothing else to install.
+**3.** That was the last download: from version 1.2.0 the deck updates itself. When a new version is out, a bar under the tabs offers it; one click installs it.
 
 > [!IMPORTANT]
 > Windows SmartScreen warns once because the exe is not code-signed. Click **More info → Run anyway**. The complete source is in this repository; build it yourself if you prefer.
