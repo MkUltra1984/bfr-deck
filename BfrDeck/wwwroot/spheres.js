@@ -29,6 +29,7 @@ function sphereParts(desc) {
     const num = /(\d+)\s*%/.exec(c), word = SPH_WORDS.find(([w]) => new RegExp('\\b' + w + '\\b', 'i').test(c));
     let pct = num ? Number(num[1]) : word ? word[1] : 30;
     if (/\bwhen\b|\bif\b|first \d+ turns|for \d+ turns? when|chance|may\b|probab/i.test(c)) pct *= 0.7;   // only some of the time
+    if (/relative to/i.test(c)) pct *= 0.5;   // "relative to lost HP": the full value is rarely reached
     if (/\b(lowers?|reduces?) (own )?(Atk|Def|Rec|max HP)/i.test(c)) continue;
     const reduction = /reduction|reduces?|mitigat|decreases?/i.test(c);
     if (/spark/i.test(c)) { if (reduction) add('bulk', 0.2); else if (/BB gauge|BC|HC|HP/i.test(c)) add(/HP|HC/i.test(c) && !/BB|BC/i.test(c) ? 'heal' : 'bb', pct / 40); else add('spark', pct / 50); continue; }
@@ -36,7 +37,7 @@ function sphereParts(desc) {
     if (/elemental (damage|weakness)/i.test(c)) { if (reduction || /negat|null/i.test(c)) add('bulk', 0.2); else add('elem', pct / 50); continue; }
     if (/BB Atk/i.test(c)) { add('bbatk', pct / 100); continue; }
     if (/OD gauge|Overdrive/i.test(c)) { add('od', pct / 40); continue; }
-    if (/BB gauge|\bBC\b|BB fill/i.test(c)) { add('bb', (pct / 30) * (/each turn/i.test(c) ? 1.5 : 1)); if (/\bHP\b|\bHC\b/i.test(c)) add('heal', pct / 40); continue; }
+    if (/BB gauge|\bBC\b|BB fill/i.test(c)) { add('bb', Math.min(2.5, (pct / 30) * (/each turn/i.test(c) ? 1.5 : 1))); /* capped: "enormously" is a word, not a number */ if (/\bHP\b|\bHC\b/i.test(c)) add('heal', pct / 40); continue; }
     if (/(restores?|recovers?|heals?|absorbs?|drains?)[^.]*\bHP\b|\bHP\b[^.]*each turn|\bHC\b/i.test(c)) { add('heal', pct / 30); continue; }
     if (/KO resistance|Angel Idol|survive|revive/i.test(c)) { add('guard', 1.5); continue; }
     if (/negates?|nullif|immun|resist/i.test(c)) { add('guard', /all status|all ailments/i.test(c) ? 1.2 : 0.6); continue; }
@@ -169,7 +170,17 @@ function suggestSp(id, u) {
   for (const o of opts) {
     const text = `${o.name} ${o.desc}`, f = sphereParts(text).f;
     let v = 0; for (const [k, x] of Object.entries(f)) v += Math.min(x, 6) * (w[k] || 0);
-    if (/\b(BB|SBB|UBB|LS|Leader Skill)\b/.test(text)) v *= 1.4;
+    // what players' builds on the wiki have in common (compared on a dozen units, 2026-11-12): the extra attack on the
+    // SBB is nearly always taken, leader-skill additions only in a lead build, a second activation and spark
+    // critical / vulnerability are popular, PvP-only options are not
+    const lead = /\b(LS|Leader Skill)\b/.test(text);
+    if (lead) v = Math.min(v * 0.3, 1.5); else if (/\b(BB|SBB|UBB)\b/.test(text)) v *= 1.4;
+    if (/^(Parameter Boost|Spark|Attack Boost)$/.test(o.cat) && /\d+%/.test(text)) v += 1.5;   // the cheap passives every build takes
+    if (/combo[^)]*attack/i.test(text) && focus.label !== 'support') v += 4;
+    if (/twice/i.test(text)) v += 2.5;
+    if (/spark critical|vulnerab/i.test(text)) v += 1.5;
+    if (/PvP|Arena|Colosseum/i.test(text)) v *= 0.2;
+    o.lead = lead;
     if (/BB (gauge )?(cost|consumption)|BC (cost|required)|reduc\w* (the )?BB gauge (required|cost)|activation cost/i.test(text)) v += 3;   // always worth it
     if (/Atk limit/i.test(text) && focus.label !== 'support') v += 1.5;
     o.value = Math.max(v, 0.3);
@@ -190,6 +201,19 @@ function spSection(id, u) {
   if (!r || !r.picks.length) return null;
   return h('div', { class: 'spbox' },
     h('h2', {}, 'Suggested SP build'),
-    h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options. Calculated by the deck: BB cost reduction first, spark and elemental damage before crit, squad buffs before self buffs. Players' own builds: BF Companion link above.`),
+    h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options. Calculated by the deck for a non-leader: the SBB's extra attack and BB cost reduction first, spark and elemental damage before crit, squad buffs before self buffs. As a leader, swap something for its leader skill option. Players' own builds: BF Companion link above.`),
     h('ul', { class: 'splist' }, r.picks.map(o => h('li', { title: o.desc || o.name }, h('span', { class: 'spc' }, `${o.sp} SP`), h('span', { class: 'grow' }, o.name), h('span', { class: 'faint' }, o.cat)))));
 }
+
+// #/units/sphdbg/<id-id-id>: writes the sphere and SP suggestions of those units to the log (support, to compare picks)
+async function sphereDebug() {
+  const m = /^#\/units\/sphdbg\/([\d-]+)/.exec(location.hash); if (!m) return;
+  for (let i = 0; i < 60 && !(DATA.items && DATA.units); i++) await new Promise(r => setTimeout(r, 500));
+  for (const id of m[1].split('-').map(Number)) {
+    const u = await unitDetail(id); if (!u) { console.warn(`sphdbg ${id} no detail`); continue; }
+    const r = suggestSpheres(id, u), sp = suggestSp(id, u);
+    console.warn(`sphdbg ${id} ${unitName(id)} | focus ${r.focus.label} | needs ${r.needs.types.join('/')} ${r.needs.ids.join('/')} | spheres ${r.picks.map(p => `${p.sphere.name} [${p.sphere.type}; ${p.sphere.how}]${p.es ? ' ES' : ''}`).join(' + ')}${r.wish ? ' | wish ' + r.wish.sphere.name : ''} | sp ${sp ? sp.sp + ': ' + sp.picks.map(o => `${o.sp} ${o.name}`).join(' ; ') : '-'} | left out: ${sp ? ((u.sp || []).flatMap(c => c.skills).filter(x => !sp.picks.some(o => o.id === x.id)).map(x => `${x.sp} ${x.name}`).join(' ; ')) : ''}`);
+  }
+  console.warn('sphdbg done');
+}
+window.addEventListener('hashchange', sphereDebug); sphereDebug();

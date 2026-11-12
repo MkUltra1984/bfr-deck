@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3 (2026-11-12)
+
+- **Suggestions tuned against players' builds.** Compared on a dozen well-known units with the players' SP builds from the wiki and BF Companion's sphere picks. SP builds now take the SBB's extra attack and the cheap stat, spark and elemental options first, keep leader skill options for lead builds, and skip PvP-only options. Sphere picks no longer overrate effects that only count at low HP or that are described with a big word instead of a number.
+
 ## 1.2.2 (2026-11-12)
 
 - **Sphere suggestions only name spheres you can really get.** A recipe counts only when every material can be had in Revived in the needed amount (first-clear rewards and shop limits are added up, recipes followed down). The card says where from: quest drop, clear reward, which shop and the price, or craft in town.
