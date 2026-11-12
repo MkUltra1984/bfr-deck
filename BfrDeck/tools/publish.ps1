@@ -12,6 +12,7 @@ $sha = [Security.Cryptography.SHA256]::Create()
 $text = foreach ($f in $files) {
     $bytes = [IO.File]::ReadAllBytes($f.FullName)
     if ($f.Extension -eq '.csproj') { $bytes = [Text.Encoding]::UTF8.GetBytes(([Text.Encoding]::UTF8.GetString($bytes) -replace '<Version>[^<]*</Version>', '')) }
+    $bytes = [byte[]]($bytes | Where-Object { $_ -ne 13 })   # line endings must not matter (git may rewrite them on checkout)
     $f.Name + ':' + [BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-', '')
 }
 $hostKey = [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($text -join "`n"))).Replace('-', '').Substring(0, 16).ToLower()
