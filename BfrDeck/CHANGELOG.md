@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 (2026-11-12)
+
+- **Sphere suggestions only name spheres you can really get.** A recipe counts only when every material can be had in Revived in the needed amount (first-clear rewards and shop limits are added up, recipes followed down). The card says where from: quest drop, clear reward, which shop and the price, or craft in town.
+- **SP builds follow the usual rules:** BB cost reduction first, spark and elemental damage before crit (crit damage is capped), a higher Atk limit for damage dealers, squad buffs before self buffs.
+- **Team Builder: squad check.** Damage (spark, elemental, crit, BB Atk, recast, extra action), Survival (mitigation, evasion, KO resistance, revive, healing; two or three wanted) and Support (BB gauge, OD gauge, status cleanse), each with what the squad covers. New rows for revive, evasion, recast and extra action. The structure follows the community guide "Brave Frontier Unit Viability & Squad Building" by WhiteHikari.
+
 ## 1.2.1 (2026-11-12)
 
 - **Suggested spheres.** Every unit page shows two spheres picked by the deck: a sphere its Extra Skill names comes first (it switches the ES on), the rest are chosen by what the unit does (attack, spark, crit, BB gauge, survival), only from spheres with a known source in Revived, each with a short reason and how to get it. When the Extra Skill asks for a sphere type (\"Spark sphere\"), the best sphere of that type leads, and the two picks are never of one type, as in the game. In the Team Builder the new ✦ button next to the two sphere slots fills the empty ones with the suggestion.

@@ -204,3 +204,9 @@ p.gives { background: var(--surface-1); border-left-color: var(--gold); }
 .splist li { display: flex; gap: 10px; align-items: baseline; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
 .splist .spc { flex: none; min-width: 46px; color: var(--gold-light); font-weight: 600; font-variant-numeric: tabular-nums; }
 .splist .faint { white-space: nowrap; font-size: 12px; }
+
+/* squad check (Team Builder) */
+.sqcheck { display: grid; gap: 8px; }
+.sqg { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.sqh { display: flex; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.chip.static.off { opacity: .55; }

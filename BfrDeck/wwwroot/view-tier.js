@@ -5,7 +5,7 @@
 // Skill data is fetched per unit through the disk cache; roles are remembered in localStorage so the second
 // visit is instant.
 
-const TIER = { roles: store.get('roleCache', { v: 1, r: {} }), running: false };
+const TIER = { roles: store.get('roleCache2', { v: 1, r: {} }), running: false };
 
 function statScore(id) {
   const m = unitMeta(id), top = (DATA.meta && DATA.meta.top) || [10800, 4000, 3725, 3650];
@@ -64,9 +64,9 @@ function renderTier(view, arg) {
     (async () => {
       const todo = ids.filter(id => !TIER.roles.r[id]).sort((a, b) => statScore(b) - statScore(a));
       let since = 0;
-      const worker = async () => { while (todo.length) { const id = todo.shift(); const u = await unitDetail(id); const r = u ? unitRoles(u) : { roles: new Set(), hits: 0 }; TIER.roles.r[id] = { roles: [...r.roles], hits: r.hits }; if (++since % 20 === 0) { store.set('roleCache', TIER.roles); if (view.isConnected && TIER.state === st) draw(); } } };
+      const worker = async () => { while (todo.length) { const id = todo.shift(); const u = await unitDetail(id); const r = u ? unitRoles(u) : { roles: new Set(), hits: 0 }; TIER.roles.r[id] = { roles: [...r.roles], hits: r.hits }; if (++since % 20 === 0) { store.set('roleCache2', TIER.roles); if (view.isConnected && TIER.state === st) draw(); } } };
       await Promise.all([worker(), worker(), worker(), worker()]);
-      store.set('roleCache', TIER.roles); TIER.running = false;
+      store.set('roleCache2', TIER.roles); TIER.running = false;
       if (view.isConnected) draw();
     })();
   }

@@ -14,9 +14,20 @@ const ROLE_DEFS = [
   { key: 'elem', label: 'Elemental damage / weakness', re: /elemental (damage|weakness)|adds? [a-z, ]*element/i },
   { key: 'bbatk', label: 'BB ATK buff', re: /BB Atk/i },
   { key: 'od', label: 'OD gauge', re: /OD gauge|Overdrive/i },
-  { key: 'angel', label: 'Angel Idol / survive', re: /Angel Idol|survive (a )?(fatal|one) |revive/i },
+  { key: 'angel', label: 'KO resistance', re: /Angel Idol|KO resistance|resistance (to|against) KO|survive (a )?(fatal|one) /i },
+  { key: 'revive', label: 'Revive', re: /\breviv|raises? [^.,;&]*from KO/i },
+  { key: 'evade', label: 'Evasion', re: /\bevasion|\bevade/i },
+  { key: 'recast', label: 'Recast', re: /\brecast/i },
+  { key: 'extra', label: 'Extra action', re: /extra action|additional action/i },
   { key: 'shield', label: 'Shield / barrier', re: /shield|barrier/i },
   { key: 'bbdef', label: 'Enemy ATK/DEF down', re: /(Atk|Def|Rec) reduction|reduces? (foes'?|enemy) (Atk|Def)/i },
+];
+// How a squad is put together (after the community guide "Brave Frontier Unit Viability & Squad Building" by
+// WhiteHikari): damage buffs, two or three ways to survive, and support. Shown as the squad check in the Team Builder.
+const TEAM_GROUPS = [
+  ['Damage', 'spark and elemental matter most, crit is capped', ['spark', 'elem', 'crit', 'bbatk', 'recast', 'extra']],
+  ['Survival', 'two or three of these', ['mitig', 'evade', 'angel', 'revive', 'heal']],
+  ['Support', '', ['bc', 'od', 'cleanse']],
 ];
 // Whether a checklist item is important for a general-purpose squad.
 const TEAM_CHECK = [

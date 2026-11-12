@@ -10,7 +10,7 @@ function route() {
   const name = m && VIEWS[m[1]] ? m[1] : 'home';
   const arg = m ? m[2] : null;
   if (name === 'home' && arg === 'reset' && m[3]) {   // #/home/reset/box | all: support route for a fresh start (caches are kept)
-    const keep = ['unitHashes', 'roleCache'];
+    const keep = ['unitHashes', 'roleCache2'];
     if (m[3] === 'box') { COLL.owned = new Set(); COLL.marks = new Set(); COLL.squads = [{ name: 'Squad 1', units: [null, null, null, null, null], friend: null, spheres: {} }]; COLL.active = 0; COLL.save(); for (const k of ['unitCounts', 'boxTotal', 'boxScannedAt']) localStorage.removeItem(k); }
     else if (m[3] === 'all') { for (const k of Object.keys(localStorage)) if (!keep.includes(k)) localStorage.removeItem(k); }
     location.replace(location.pathname + '#/home'); location.reload(); return;

@@ -124,12 +124,12 @@ function renderTeam(view) {
     const sugg = h('div', {});
     if (gaps.length && COLL.owned.size) {
       sugg.append(h('h3', {}, 'Fill the gaps from your box'), h('p', { class: 'faint' }, 'Best owned units for each effect not yet covered, by the tier-list score. Click one to put it in the first empty slot (or replace the weakest non-leader).'));
-      const roles = store.get('roleCache', { v: 1, r: {} }).r;
+      const roles = store.get('roleCache2', { v: 1, r: {} }).r;
       const owned = [...COLL.owned].filter(id => !all.includes(id));
       // make sure the owned units' roles are known (cached through the disk cache)
       const todo = owned.filter(id => !roles[id]).sort((a, b) => statScore(b) - statScore(a)).slice(0, 120);
       await Promise.all(todo.map(async id => { const u = await unitDetail(id); const r = u ? unitRoles(u) : { roles: new Set(), hits: 0 }; roles[id] = { roles: [...r.roles], hits: r.hits }; }));
-      if (todo.length) store.set('roleCache', { v: 1, r: roles });
+      if (todo.length) store.set('roleCache2', { v: 1, r: roles });
       const place = id => { let slot = s.units.indexOf(null); if (slot < 0) { let worst = -1, ws = 9; s.units.forEach((u, i) => { if (i && statScore(u) < ws) { ws = statScore(u); worst = i; } }); slot = worst; } if (slot >= 0) setSlot(slot, id); };
       for (const [k, label] of gaps) {
         const cands = owned.filter(id => roles[id] && roles[id].roles.includes(k)).sort((a, b) => fullScore(b) - fullScore(a)).slice(0, 4);
@@ -139,6 +139,11 @@ function renderTeam(view) {
     analysis.replaceChildren(
       h('div', { class: 'row', style: 'justify-content:space-between' }, h('b', {}, 'Totals'), h('span', { class: 'faint' }, `${elements.size} element${elements.size === 1 ? '' : 's'}: ${[...elements].filter(Boolean).map(e => ELEMENTS[e]).join(', ') || '—'}`), impsToggle), totals,
       h('div', { class: 'cols', style: 'margin-top:8px' }, lsBox('Leader skill', s.units[0]), lsBox('Friend leader skill', s.friend)),
+      h('h3', {}, 'Squad check'),
+      h('div', { class: 'sqcheck' }, TEAM_GROUPS.map(([name, hint, keys]) => { const n = keys.filter(k => covered.has(k)).length;
+        return h('div', { class: 'sqg' }, h('div', { class: 'sqh' }, h('b', {}, name), h('span', { class: 'faint' }, `${n} of ${keys.length}${hint ? ' · ' + hint : ''}`)),
+          h('div', { class: 'row' }, keys.map(k => h('span', { class: covered.has(k) ? 'chip static on' : 'chip static off' }, (covered.has(k) ? '✓ ' : '✗ ') + ROLE_DEFS.find(d => d.key === k).label)))); })),
+      h('p', { class: 'faint', style: 'margin:4px 0 0' }, 'Squad structure after the community guide "Brave Frontier Unit Viability & Squad Building" by WhiteHikari. No squad fits every fight.'),
       h('h3', {}, 'Who brings what'), h('p', { class: 'faint', style: 'margin-top:0' }, 'LS/ES count in the squad only for the leader and the friend; BB, SBB and UBB count for everyone. Read from the skill text.'), matrix, sugg);
   })();
 

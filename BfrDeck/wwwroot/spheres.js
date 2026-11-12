@@ -52,13 +52,36 @@ function sphereParts(desc) {
   return { f, only };
 }
 
+// How many of an item Revived can give: endless when it drops or comes with every clear, else what first clears and
+// shop limits add up to, plus what its recipe can make from materials counted the same way. 0 = cannot be had now.
+const ITEM_HAVE = new Map();
+function itemHave(id, seen = new Set()) {
+  if (ITEM_HAVE.has(id)) return ITEM_HAVE.get(id);
+  if (seen.has(id)) return 0;
+  seen.add(id);
+  const s = itemSources(id); let n = s.chest.length || s.hit.length ? Infinity : 0;
+  for (const r of s.clear) n += r[2] === 1 ? (r[3] || 1) : Infinity;
+  for (const r of s.shop) n += r[4] > 0 ? r[4] : Infinity;
+  for (const r of s.recipe) { let c = Infinity; for (const [mat, need] of materials(r[2])) c = Math.min(c, Math.floor(itemHave(mat, seen) / (need || 1))); if (c > 0) n += c * (r[4] || 1); }
+  seen.delete(id); if (!seen.size) ITEM_HAVE.set(id, n);
+  return n;
+}
+// the way to a sphere in a few words; '' when Revived cannot give it now (a recipe whose materials do not exist counts as none)
+function sphereHow(id) {
+  if (itemHave(id) < 1) return '';
+  const s = itemSources(id);
+  if (s.chest.length || s.hit.length) return 'quest drop';
+  if (s.clear.length) return 'clear reward';
+  if (s.shop.length) { const r = [...s.shop].sort((a, b) => a[3] - b[3])[0]; return `${r[1] === 1 ? r[2] + ' shop' : SHOP_NAMES[r[1]] || 'shop'} · ${fmt(r[3])}`; }
+  return 'craft in town';
+}
+
 function sphereList() {
   if (sphereCache) return sphereCache;
   const out = [];
   for (const [id, it] of Object.entries((DATA.items && DATA.items.items) || {})) {
     if (it[1] !== 3 || !it[2] || !it[4] || /[぀-ヿ一-鿿]/.test(it[4]) || /-\d+%/.test(it[4])) continue;
-    const src = itemSources(Number(id));
-    const how = src.recipe.length ? 'craft' : src.shop.length ? 'shop' : src.clear.length ? 'clear reward' : src.chest.length || src.hit.length ? 'quest drop' : '';
+    const how = sphereHow(Number(id));
     const p = sphereParts(it[4]);
     out.push({ id: Number(id), name: it[0], rarity: it[2], desc: it[4], f: p.f, only: p.only, how, type: SPHERE_TYPE[id] || '' });
   }
@@ -68,7 +91,7 @@ function sphereList() {
 // how much each strength is worth to a unit, from what its skills do
 function sphereFocus(u) {
   const r = unitRoles(u), has = k => r.roles.has(k);
-  const support = ['heal', 'mitig', 'cleanse', 'shield', 'angel'].filter(has).length, offense = ['spark', 'crit', 'elem', 'bbatk', 'atk'].filter(has).length;
+  const support = ['heal', 'mitig', 'cleanse', 'shield', 'angel', 'revive', 'evade'].filter(has).length, offense = ['spark', 'crit', 'elem', 'bbatk', 'atk'].filter(has).length;
   const w = { atk: 1 + 0.2 * offense, spark: (has('spark') ? 1.5 : 0.6) + (r.hits >= 20 ? 0.3 : 0), crit: has('crit') ? 1.3 : 0.4, elem: has('elem') ? 1.2 : 0.5, bbatk: 0.8,
     bulk: 0.5 + 0.3 * support, mitig: 0.5 + 0.25 * support, bb: 1 + 0.3 * support, heal: 0.4 + 0.2 * support, guard: 0.5 + 0.2 * support, od: 0.3 };
   const pure = support >= 2 && offense <= 1;
@@ -142,13 +165,15 @@ function suggestSp(id, u) {
   const opts = [];
   for (const cat of (u && u.sp) || []) for (const s of cat.skills || []) opts.push({ id: s.id, cat: cat.cat, name: s.name, desc: s.desc || '', sp: s.sp || 0, needs: s.needs });
   if (!opts.length || opts.length > 22) return null;
-  const focus = sphereFocus(u);
+  const focus = sphereFocus(u), w = { ...focus.w, crit: focus.w.crit * 0.6, spark: focus.w.spark * 1.2, elem: focus.w.elem * 1.2 };   // crit damage is capped, spark and elemental are not
   for (const o of opts) {
     const text = `${o.name} ${o.desc}`, f = sphereParts(text).f;
-    let v = 0; for (const [k, x] of Object.entries(f)) v += Math.min(x, 6) * (focus.w[k] || 0);
+    let v = 0; for (const [k, x] of Object.entries(f)) v += Math.min(x, 6) * (w[k] || 0);
     if (/\b(BB|SBB|UBB|LS|Leader Skill)\b/.test(text)) v *= 1.4;
+    if (/BB (gauge )?(cost|consumption)|BC (cost|required)|reduc\w* (the )?BB gauge (required|cost)|activation cost/i.test(text)) v += 3;   // always worth it
+    if (/Atk limit/i.test(text) && focus.label !== 'support') v += 1.5;
     o.value = Math.max(v, 0.3);
-    o.why = (Object.entries(f).map(([k, x]) => [k, x * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1])[0] || [])[0];
+    o.why = (Object.entries(f).map(([k, x]) => [k, x * (w[k] || 0)]).sort((a, b) => b[1] - a[1])[0] || [])[0];
   }
   const index = new Map(opts.map((o, i) => [String(o.id), i]));
   const need = opts.map(o => [].concat(o.needs == null ? [] : o.needs).map(x => index.get(String(x))).filter(x => x != null));
@@ -165,6 +190,6 @@ function spSection(id, u) {
   if (!r || !r.picks.length) return null;
   return h('div', { class: 'spbox' },
     h('h2', {}, 'Suggested SP build'),
-    h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options, picked by the deck for what this unit does. Players' own builds: BF Companion link above.`),
+    h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options. Calculated by the deck: BB cost reduction first, spark and elemental damage before crit, squad buffs before self buffs. Players' own builds: BF Companion link above.`),
     h('ul', { class: 'splist' }, r.picks.map(o => h('li', { title: o.desc || o.name }, h('span', { class: 'spc' }, `${o.sp} SP`), h('span', { class: 'grow' }, o.name), h('span', { class: 'faint' }, o.cat)))));
 }
