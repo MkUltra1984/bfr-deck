@@ -130,7 +130,7 @@ function esSphereNeeds(u) {
 // { picks: [{ sphere, why: [labels], es: bool }], wish, needs, focus }: two spheres for the unit (detail `u` from unitDetail)
 function suggestSpheres(id, u) {
   const all = sphereList(), focus = sphereFocus(u), needs = esSphereNeeds(u), el = (ELEMENTS[unitElement(id)] || '').toLowerCase();
-  const fit = s => { if (s.only && el && !s.only.includes(el)) return 0; let t = 0; for (const [k, v] of Object.entries(s.f)) t += v * (focus.w[k] || 0); return t; };
+  const fit = s => { if (s.only && el && !s.only.includes(el)) return 0; let t = 0; for (const [k, v] of Object.entries(s.f)) t += v * (focus.w[k] || 0); const r = sphereRec(s.name); return r && r[0] ? t * 1.33 : t; };   // recommended in KayzX's Sphere Tracker: a third more
   const why = s => Object.entries(s.f).map(([k, v]) => [k, v * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1]).slice(0, 2).filter(x => x[1] > 0).map(x => SPH_LABEL[x[0]]);
   const main = s => (Object.entries(s.f).map(([k, v]) => [k, v * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1])[0] || [''])[0];
   const picks = [];
@@ -159,13 +159,15 @@ function suggestSpheres(id, u) {
   return { picks, wish, easy, needs, focus };
 }
 
+// the community sheet's word on a sphere, as a small tag
+function recTag(name) { const r = sphereRec(name); return r && r[0] ? h('span', { class: 'tag green', title: "Recommended in KayzX's Sphere Tracker" + (r[2] ? ` (bazaar priority: ${r[2]})` : '') }, r[2] ? `recommended · ${r[2].toLowerCase()} priority` : 'recommended') : null; }
 // the block on a unit's page
 function sphereSection(id, u) {
   const r = suggestSpheres(id, u);
   if (!r.picks.length) return null;
   const card = p => h('a', { class: 'sphcard', href: `#/items/${p.sphere.id}`, title: p.sphere.desc },
     h('img', { src: itemIcon(p.sphere.id), alt: '', width: 40, height: 40, loading: 'lazy' }),
-    h('div', {}, h('div', { class: 'nm' }, p.sphere.name, h('span', { class: 'tag' }, `★${p.sphere.rarity}`), p.sphere.type ? h('span', { class: 'tag' }, p.sphere.type) : null, p.es ? h('span', { class: 'tag gold' }, 'switches on its ES') : null),
+    h('div', {}, h('div', { class: 'nm' }, p.sphere.name, h('span', { class: 'tag' }, `★${p.sphere.rarity}`), p.sphere.type ? h('span', { class: 'tag' }, p.sphere.type) : null, p.es ? h('span', { class: 'tag gold' }, 'switches on its ES') : null, recTag(p.sphere.name), ownTag(p.sphere.id)),
       h('div', { class: 'faint' }, [p.why.join(' · '), p.easy ? p.sphere.easy : p.sphere.how || 'not obtainable in Revived yet'].filter(Boolean).join(' · ')),
       h('p', {}, p.sphere.desc)));
   return h('div', { class: 'sphbox' },
@@ -174,7 +176,8 @@ function sphereSection(id, u) {
     r.needs.types.length ? h('p', { class: 'sphneed' }, 'Its Extra Skill needs a ', h('b', {}, r.needs.types.join(' or ')), ' sphere.') : null,
     h('div', { class: 'sphcards' }, r.picks.map(card), r.wish ? card(r.wish) : null),
     r.easy.length ? [h('h3', { class: 'spheasy' }, 'Easy to get early'), h('p', { class: 'faint', style: 'margin:0 0 8px' }, 'Not as strong, but they drop in quests or are crafted from materials that drop. Good until you can afford the ones above.'), h('div', { class: 'sphcards' }, r.easy.map(card))] : null,
-    h('p', { style: 'margin:8px 0 0' }, h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', `https://bfcompanion.app/#/unit/${id}`); } }, 'Spheres and SP builds on BF Companion ›'), h('span', { class: 'faint' }, ' · sphere types from BF Companion')));
+    ownedSphereBlock(id, u, card),
+    h('p', { style: 'margin:8px 0 0' }, h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', `https://bfcompanion.app/#/unit/${id}`); } }, 'Spheres and SP builds on BF Companion ›'), h('span', { class: 'faint' }, ' · sphere types from BF Companion · recommendations from '), h('a', { href: '#', onclick: e => { e.preventDefault(); host.open('site', 'https://docs.google.com/spreadsheets/d/1kDoYRJeJZsdKt6cbdgPltX4QiaSeIvZE1ijXKmwEydo/htmlview'); } }, "KayzX's Sphere Tracker")));
 }
 
 // ---- SP build -------------------------------------------------------------------------------------------------
@@ -222,6 +225,7 @@ function spSection(id, u) {
   return h('div', { class: 'spbox' },
     h('h2', {}, 'Suggested SP build'),
     h('p', { class: 'faint', style: 'margin:0 0 8px' }, `${r.sp} of ${SP_BUDGET} SP · ${r.picks.length} of its ${r.total} options. Calculated by the deck for a non-leader: the SBB's extra attack and BB cost reduction first, spark and elemental damage before crit, squad buffs before self buffs. As a leader, swap something for its leader skill option. Players' own builds: BF Companion link above.`),
+    spOwnLine(id, r),
     h('ul', { class: 'splist' }, r.picks.map(o => h('li', { title: o.desc || o.name }, h('span', { class: 'spc' }, `${o.sp} SP`), h('span', { class: 'grow' }, o.name), h('span', { class: 'faint' }, o.cat)))));
 }
 

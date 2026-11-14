@@ -22,6 +22,9 @@ function renderHome(view, arg) {
     tile('Gems', '—', 'turn on live to read', 'gems'), tile('Zel', '—', '', 'zel'), tile('Karma', '—', '', 'karma'),
     timerTile(RULES.resets[0]), timerTile(RULES.resets[1]), timerTile(RULES.resets[2]),
     squadTile(view), pullTile(now), featuredTile(now), vortexTile(now));
+  // the account panel (My Summoner) is the first tile; it redraws itself and the header after sign-in, refresh and sign-out
+  const panel = msPanel(() => { if (panel.isConnected) renderHome(view, arg); });
+  tiles.prepend(panel);
   view.replaceChildren(head, tiles);
   const tick = () => {
     const n = Date.now() / 1000;
@@ -67,6 +70,7 @@ async function refreshHead(head, tiles) {
     t.querySelector('.v').textContent = val != null ? fmt(val) : '—';
     t.querySelector('.s').textContent = val != null ? sub : (live ? 'open the home screen in game' : 'turn on live to read');
   }
+  msTiles(tiles, head);   // signed in: currencies and level come from the account
   clearTimeout(head._t); head._t = setTimeout(() => { if (head.isConnected) refreshHead(head, tiles); }, 5000);
 }
 
@@ -79,7 +83,7 @@ function squadTile(view) {
     return h('a', { class: `u el-${unitElement(id)}${slot === 0 ? ' lead' : ''}`, href: `#/units/${id}`, title: unitName(id) }, spriteCanvas(id, 170, { maxScale: 1.0, height: 80, mass: true, fitWidth: 88 }), h('span', { class: 'aname' }, shortUnitName(id)));
   }));
   analyseSquad(s.units).then(a => { meta.textContent = `cost ${a.cost} · ${a.elements.size} element${a.elements.size === 1 ? '' : 's'}${a.leader && a.leader.ls ? ' · LS ' + a.leader.ls.name : ''}`; });
-  return h('div', { class: 'tile wide stagetile' }, h('h4', {}, h('span', { class: 'row' }, COLL.squads.map((x, i) => h('button', { class: i === si ? 'chip on' : 'chip', onclick: () => { COLL.active = i; COLL.save(); renderHome(view); } }, x.name)), h('a', { class: 'faint', href: '#/team' }, 'edit ›')), meta), sq);
+  return h('div', { class: 'tile wide stagetile' }, h('h4', {}, h('span', { class: 'row' }, COLL.squads.map((x, i) => h('button', { class: i === si ? 'chip on' : 'chip', onclick: () => { COLL.active = i; COLL.save(); renderHome(view); } }, x.name)), h('a', { class: 'faint', href: '#/team' }, 'edit ›')), meta), sq, liveVerdict(s), gearBlock(s));
 }
 
 // ---- should I pull: cycles through this week's banners (and the permanent gem gates); always shows the

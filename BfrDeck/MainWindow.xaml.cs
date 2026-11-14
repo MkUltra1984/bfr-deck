@@ -44,6 +44,7 @@ public partial class MainWindow : Window
         _wwwroot = ResolveWwwroot();
         Housekeeping();
         _updater = new Updater(_dataDir, _webVersion, Log) { WebReady = UseWebUpdate, RestartReady = () => Dispatcher.Invoke(() => { if (_updater!.Restart()) Close(); }) };
+        _summoner = new Summoner(_dataDir, typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "dev", Log);
         LoadSettings();
         foreach (var t in TabDefs)
         {
@@ -244,6 +245,29 @@ public partial class MainWindow : Window
                 e.Response = Json(JsonSerializer.Serialize(new { text }));
                 return;
             }
+            if (uri.AbsolutePath.StartsWith("/api/ms/"))
+            {
+                // My Summoner (the player's own account, see Summoner.cs): /state, POST /login {email, password, remember},
+                // POST /logout[?forget=1], and GET /<part>[?fresh=1] for an account part as the service's own JSON.
+                var what = uri.AbsolutePath.Substring("/api/ms/".Length);
+                if (what == "login" && e.Request.Content != null)
+                {
+                    using var msIn = new MemoryStream(); e.Request.Content.CopyTo(msIn);
+                    using var doc = JsonDocument.Parse(msIn.ToArray());
+                    string Str(string k) => doc.RootElement.TryGetProperty(k, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+                    var remember = doc.RootElement.TryGetProperty("remember", out var rv) && rv.ValueKind == JsonValueKind.True;
+                    var (code, message) = await _summoner.Login(Str("email"), Str("password"), remember);
+                    e.Response = Json(JsonSerializer.Serialize(new { ok = code == 200, code, message, state = _summoner.State() }));
+                    return;
+                }
+                if (what == "logout") { await _summoner.Logout(HttpUtility.ParseQueryString(uri.Query)["forget"] == "1"); e.Response = Json(JsonSerializer.Serialize(_summoner.State())); return; }
+                if (what == "state") { e.Response = Json(JsonSerializer.Serialize(_summoner.State())); return; }
+                // the page's own query goes along to the service, except "fresh" (that one is for this program)
+                var q = HttpUtility.ParseQueryString(uri.Query); var isFresh = q["fresh"] == "1"; q.Remove("fresh");
+                var (pc, pb) = await _summoner.Get(what + (q.Count > 0 ? "?" + q.ToString() : ""), isFresh);
+                e.Response = _env!.CreateWebResourceResponse(new MemoryStream(pb), pc == 0 ? 502 : pc, pc == 200 ? "OK" : "Error", $"Content-Type: application/json\nCache-Control: no-store\n{Cors}");
+                return;
+            }
             if (uri.AbsolutePath.StartsWith("/api/update"))
             {
                 // /api/update: state; /check: ask the releases page; /apply: download and install in the background
@@ -350,6 +374,7 @@ public partial class MainWindow : Window
 
     // Live reader loop: when enabled and BlueStacks runs, read the header every 8 s.
     private LiveReader _live = null!;
+    private Summoner _summoner = null!;
     private async void StartLiveLoop()
     {
         _live = new LiveReader(Log) { Enabled = _settings.Live };

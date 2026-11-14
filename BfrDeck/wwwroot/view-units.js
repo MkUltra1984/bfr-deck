@@ -120,6 +120,7 @@ async function renderUnitPage(view, id) {
   if (m) head.append(h('div', { class: 'stats' }, ['HP', 'ATK', 'DEF', 'REC'].map((k, i) => h('div', { class: 'stat' }, h('div', { class: 'k' }, k), h('div', { class: 'v' }, fmt(m[5 + i])), h('div', { class: 's' }, `Lv1 ${fmt(m[1 + i])}`)))));
   const u = await unitDetail(id);
   body.replaceChildren();
+  const copies = copiesSection(id); if (copies) body.append(copies);   // signed in to My Summoner: your own copies of this unit
   // the evolution line (the author: "does our unit viewer include evolution lines?"): every form in order, this one
   // highlighted, each a link to its page, like bfrevive.net's unit pages
   if (u && u.evo && u.evo.length > 1) head.append(h('div', { class: 'evoline' }, h('span', { class: 'k' }, 'Evolution'),

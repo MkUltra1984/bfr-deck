@@ -419,3 +419,57 @@ p.gives b { color: var(--gold); }
 .marquee { cursor: grab; user-select: none; } .marquee.dragging { cursor: grabbing; } .marquee.dragging .track { animation-play-state: paused; }
 .marquee a, .marquee img, .marquee canvas, .vstrip a, .vstrip img, .metabox a, .metabox canvas { -webkit-user-drag: none; user-select: none; }
 .metabox .mstage { cursor: grab; user-select: none; } .metabox .mstage.dragging { cursor: grabbing; }
+
+/* My Summoner: the account panel on Home, the sign-in dialog, "Your copies" on a unit page */
+.mspanel .msgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 12px; margin: 2px 0 8px; }
+.mspanel .mscell .k, .mspanel .msnext .k { font-size: .72em; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+.mspanel .mscell .v { font-size: 1.05em; font-weight: 700; } .mspanel .mscell .s { font-size: .74em; color: var(--dim); }
+.mspanel .msline { font-size: .9em; padding-top: 6px; border-top: 1px solid var(--line); } .mspanel .msline .tag { margin: 4px 4px 0 0; }
+.mspanel .msnext { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line); font-size: .9em; } .mspanel .msnext ol { margin: 4px 0 0; padding-left: 20px; } .mspanel .msnext li { margin: 3px 0; }
+.msmodal { max-width: 420px; } .msmodal input[type=email], .msmodal input[type=password] { box-sizing: border-box; }
+.mscopies { margin: 8px 0; } .mscopy { padding: 6px 0; border-top: 1px solid var(--line); font-size: .92em; } .mscopy .tag { margin-left: 6px; }
+.livesq { position: relative; z-index: 2; margin-top: 10px; padding-top: 6px; border-top: 1px solid var(--line); font-size: .88em; } .livesq .tag { margin: 4px 4px 0 0; }
+.gearlist { margin-top: 4px; } .gearrow { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; padding: 2px 0; }
+
+/* ---- live account, compact layout (design: my-summoner-ui-spec.md) ---- */
+.mspanel .strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px 12px; }
+.mspanel .stat { background: none; border: 0; border-radius: 0; padding: 0; min-width: 0; }
+.mspanel .stat .k { font-size: .72em; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+.mspanel .stat .v { font-size: 1.08em; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mspanel .stat .s { font-size: .72em; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .mspanel .stat .red { color: var(--red); }
+.mspanel .msnext { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line); font-size: .92em; }
+.nextrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 34px; padding: 2px 0 2px 8px; border-top: 1px solid var(--line); border-left: 3px solid transparent; }
+.nextrow:first-of-type { border-top: 0; } .nextrow.first { border-left-color: var(--gold); }
+.nextrow .n { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--bg3); color: var(--dim); font-size: .8em; display: flex; align-items: center; justify-content: center; }
+.nextrow b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nextrow .why { flex: 0 0 100%; margin: 0 0 4px 28px; font-size: .92em; }
+.nextrow.full { align-items: flex-start; padding: 8px 0 8px 8px; } .nextrow.full b { white-space: normal; } .nextrow.full p { margin: 2px 0 0; }
+.row-btn { flex: none; min-height: 28px; min-width: 56px; padding: 0 12px; border-radius: 999px; background: var(--bg3); border: 1px solid var(--line); color: var(--dim); cursor: pointer; }
+.row-btn[aria-expanded=true] { color: var(--gold); border-color: var(--gold); }
+.top .right .msbtn { font-size: .8em; }
+/* signed in: currencies live in the strip, timers shrink to one row */
+.tiles.compact > .tile[data-k=gems], .tiles.compact > .tile[data-k=zel], .tiles.compact > .tile[data-k=karma] { display: none; }
+.tiles.compact > .tile.stripe { padding: 5px 10px 5px 12px; display: flex; align-items: baseline; gap: 8px; }
+.tiles.compact > .tile.stripe .v { font-size: 1em; margin: 0; } .tiles.compact > .tile.stripe .s { display: none; }
+.tile.fold { padding: 0; } .tile.fold > summary { cursor: pointer; font-weight: 700; min-height: 38px; padding: 0 12px; display: flex; align-items: center; }
+.tile.fold > .infold { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; }
+.livesq.gear > summary { cursor: pointer; min-height: 30px; display: flex; align-items: center; gap: 6px; }
+.livesq .flaghelp { margin-top: 6px; } .livesq .flaghelp p { margin: 3px 0; font-size: .95em; color: var(--dim); } .livesq .chip { min-height: 24px; }
+details.mscopies > summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; } details.mscopies .showmore { margin-left: auto; } details.mscopies[open] .showmore { display: none; }
+/* My Account tab */
+.seg { margin: 4px 0 8px; } .seg .chip { min-height: 30px; padding: 4px 14px; display: inline-flex; align-items: center; }
+.accbody .row { margin: 6px 0; } .evolist { padding: 0 10px; }
+.evorow { border-top: 1px solid var(--line); } .evorow:first-child { border-top: 0; }
+.evorow > summary { cursor: pointer; min-height: 46px; display: flex; align-items: center; gap: 10px; } .evorow > summary img { border-radius: 6px; flex: none; }
+.evorow > summary .grow { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.evobody { padding: 0 0 10px 46px; font-size: .94em; } .evobody p { margin: 4px 0; }
+.kvrow { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.4fr); gap: 10px; padding: 3px 0; align-items: center; }
+.kvrow .bar { margin: 0; } table.shop { width: 100%; border-collapse: collapse; } table.shop th { text-align: left; font-size: .76em; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; padding: 4px 6px; }
+table.shop td { padding: 5px 6px; border-top: 1px solid var(--line); } table.shop .num { text-align: right; font-variant-numeric: tabular-nums; }
+.green { color: var(--green); } .gold { color: var(--gold); }
+.bigstat .k { font-size: .72em; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; } .bigstat .v { font-size: 1.6em; font-weight: 700; }
+.daybars { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; align-items: end; height: 110px; }
+.daybar { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; } .daybar i { display: block; width: 100%; min-height: 2px; background: var(--gold); border-radius: 3px 3px 0 0; } .daybar span { font-size: .72em; color: var(--dim); }
+ol.moves { margin: 4px 0 6px; padding-left: 22px; } ol.moves li { margin: 3px 0; }
+.buildrow { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); } .buildrow:first-child { border-top: 0; } .buildrow img { border-radius: 6px; } .buildrow p { margin: 2px 0; font-size: .94em; }
+.copyreport { margin-top: 4px; font-size: .94em; } .copyreport p { margin: 3px 0; }

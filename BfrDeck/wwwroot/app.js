@@ -1,7 +1,7 @@
 'use strict';
 // Router and data bootstrap.
 
-const VIEWS = { home: renderHome, units: renderUnits, items: renderItems, summon: renderGates, gates: renderGates, team: renderTeam, guide: renderGuide, quests: renderQuests, vortex: renderVortex, gq: renderGrandQuest, scan: renderScan, tier: renderTier };
+const VIEWS = { home: renderHome, account: renderAccount, units: renderUnits, items: renderItems, summon: renderGates, gates: renderGates, team: renderTeam, guide: renderGuide, quests: renderQuests, vortex: renderVortex, gq: renderGrandQuest, scan: renderScan, tier: renderTier };
 const NAV_OF = { items: 'units', gates: 'summon', scan: 'units', vortex: 'quests', gq: 'quests' };
 let ready = false;
 
@@ -61,6 +61,7 @@ async function boot(fresh) {
 }
 
 glossaryInit();
+msBoot();   // My Summoner: a remembered login reads the account at start
 $('refresh').addEventListener('click', async () => { $('refresh').disabled = true; await boot(true); $('refresh').disabled = false; toast('Game data refreshed'); });
 window.addEventListener('hashchange', route);
 setInterval(showAge, 60000);
