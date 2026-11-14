@@ -131,7 +131,7 @@ function msPanel(redraw) {
       MS.busy ? null : h('button', { class: 'primary', onclick: () => msSignIn(redraw) }, 'Sign in')));
     return box;
   }
-  const stat = (k, v, sub, cls) => h('div', { class: 'stat' }, h('div', { class: 'k' }, k), h('div', { class: 'v num' + (cls ? ' ' + cls : '') }, v), sub ? h('div', { class: 's' + (cls ? ' ' + cls : '') }, sub) : null);
+  const stat = (k, v, sub, cls, icon) => h('div', { class: 'stat' }, h('div', { class: 'k' }, icon ? h('img', { class: 'sicon', src: `img/s-${icon}.png`, alt: '' }) : null, k), h('div', { class: 'v num' + (cls ? ' ' + cls : '') }, v), sub ? h('div', { class: 's' + (cls ? ' ' + cls : '') }, sub) : null);
   const over = P.unit_box.used > P.unit_box.capacity;
   const full = P.energy.full_at ? `full ${fmtClock.format(new Date(P.energy.full_at * 1000))}` : 'full';
   const next = (H.next && H.next.items) || [], all = next.length + ((H.next && H.next.more) || 0);
@@ -141,9 +141,8 @@ function msPanel(redraw) {
     return h('div', { class: 'nextrow' + (i === 0 ? ' first' : '') }, h('span', { class: 'n' }, String(i + 1)), h('b', { class: 'grow' }, n.title), n.reason ? btn : null, why);
   });
   box.append(
-    h('div', { class: 'strip' }, stat('Level', fmt(P.level), `${fmt(P.exp_to_next)} EXP to next`), stat('Energy', `${P.energy.now} / ${P.energy.max}`, full), stat('Arena orbs', `${P.arena_orbs.now} / ${P.arena_orbs.max}`), stat('Gifts', fmt(P.presents_waiting), P.presents_waiting ? 'waiting' : ''),
-      stat('Unit box', `${fmt(P.unit_box.used)} / ${fmt(P.unit_box.capacity)}`, over ? 'Full' : '', over ? 'red' : ''), stat('Cost cap', fmt(P.deck_cost_cap))),
-    next.length ? h('div', { class: 'msnext' }, h('div', { class: 'row' }, h('span', { class: 'k grow' }, 'What next'), h('a', { class: 'faint', href: '#/account/todo' }, `See all ${all} ›`)), rows) : null,
+    h('div', { class: 'strip' }, stat('Level', fmt(P.level), `${fmt(P.exp_to_next)} EXP to next`, '', 'level'), stat('Energy', `${P.energy.now} / ${P.energy.max}`, full, '', 'energy'), stat('Arena orbs', `${P.arena_orbs.now} / ${P.arena_orbs.max}`, '', '', 'orbs'), stat('Gifts', fmt(P.presents_waiting), P.presents_waiting ? 'waiting' : '', '', 'gifts'),
+      stat('Unit box', `${fmt(P.unit_box.used)} / ${fmt(P.unit_box.capacity)}`, over ? 'Full' : '', over ? 'red' : '', 'box'), stat('Cost cap', fmt(P.deck_cost_cap), '', '', 'cost')),
     msToday(H));
   return box;
 }
@@ -332,9 +331,11 @@ function msTierBlock() {
 // Home, one row under "What next": today's pointers from My Summoner (an evolution that is ready, a challenge, story).
 function msToday(H) {
   const T = (H && H.today) || {}, S = (H && H.story) || {}, chips = [];
-  if (T.evolution && T.evolution.ready) chips.push(h('a', { class: 'chip', href: '#/account/evolve', title: T.evolution.unit ? `${T.evolution.unit.name}: ${T.evolution.unit.reason}` : '' }, `Evolve: ${T.evolution.ready} ready`));
-  if (T.challenge && T.challenge.pick) chips.push(h('a', { class: 'chip', href: '#/account/challenges', title: T.challenge.pick.why || '' }, `Challenge: ${T.challenge.pick.title}`));
-  if (S.percent != null) chips.push(h('a', { class: 'chip', href: '#/account/story', title: S.quest ? `Next: ${S.quest.name} (${S.quest.area_name})` : '' }, `Story ${S.percent}%`));
+  const todo = ((H && H.next && H.next.items) || []).length + ((H && H.next && H.next.more) || 0);
+  if (todo) chips.push(h('a', { class: 'chip', href: '#/account/todo', title: 'What My Summoner suggests you do next' }, h('img', { class: 'sicon', src: 'img/s-todo.png', alt: '' }), `To do: ${todo}`));
+  if (T.evolution && T.evolution.ready) chips.push(h('a', { class: 'chip', href: '#/account/evolve', title: T.evolution.unit ? `${T.evolution.unit.name}: ${T.evolution.unit.reason}` : '' }, h('img', { class: 'sicon', src: 'img/s-evolve.png', alt: '' }), `Evolve: ${T.evolution.ready} ready`));
+  if (T.challenge && T.challenge.pick) chips.push(h('a', { class: 'chip', href: '#/account/challenges', title: T.challenge.pick.why || '' }, h('img', { class: 'sicon', src: 'img/s-challenge.png', alt: '' }), `Challenge: ${T.challenge.pick.title}`));
+  if (S.percent != null) chips.push(h('a', { class: 'chip', href: '#/account/story', title: S.quest ? `Next: ${S.quest.name} (${S.quest.area_name})` : '' }, h('img', { class: 'sicon', src: 'img/s-story.png', alt: '' }), `Story ${S.percent}%`));
   return chips.length ? h('div', { class: 'row mstoday' }, h('span', { class: 'k' }, 'Today'), chips) : null;
 }
 // Item pages: how many of this item your account holds.
@@ -364,6 +365,15 @@ function msBoxList() {
 }
 
 // Start: read the account if a login is remembered or a session is open; redraw Home when it arrives.
+// Always live: signed in, the account is read again every five minutes and when you come back to the window after a
+// while, without pressing anything. Nothing is read while the window is hidden, and never more than once a minute.
+async function msAuto() {
+  if (!MS.home || MS.busy || document.hidden || Date.now() / 1000 - MS.at < 60 || document.querySelector('.overlay')) return;
+  const y = $('view').scrollTop; await msLoad(true);
+  if (MS.home && /^#\/(home\/?)?$/.test(location.hash || '#/') && MS.redraw) { MS.redraw(); $('view').scrollTop = y; }
+}
+setInterval(() => { if (Date.now() / 1000 - MS.at >= 300) msAuto(); }, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() / 1000 - MS.at >= 120) msAuto(); });
 async function msBoot() {
   await msLoad(false);
   // the page that is open was drawn before the account arrived: draw it again (not while a dialog is open)

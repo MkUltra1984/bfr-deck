@@ -55,7 +55,7 @@
 - **Your squad** with the real battle sprites, cost, elements and leader skill.
 - **Should I pull?** gives a verdict for each open gate against the units you already own, with the odds one click away.
 - **Featured this week** and the current banners with their time left.
-- With live stats on, the header shows your gems, Zel and Karma, read from a picture of the game screen.
+- Signed in, the header and tiles show your level, gems, Zel and Karma from your account, read again by itself every few minutes.
 
 ### Units and unit pages
 
@@ -135,7 +135,6 @@
 | `bfrevive.net/units/u/<id>.json` | one unit's skills, when its page is opened or a list needs it | cached on disk |
 | `cdn.bfrevive.net` | unit icons, sprites, item and gate pictures | cached for 14 days, 300 MB at most |
 | the "BFRevived" and "Wiki" tabs | bfrevive.net and the Brave Frontier wiki, shown in an embedded browser like any browser would | only when you open them |
-| the emulator window (optional) | a picture of the screen for live stats, read with Windows' own text recognition | only while switched on |
 | `github.com/MkUltra1984/bfr-deck` | the update check | at start and every 6 hours |
 
 Requests from the deck identify themselves as `BfrDeck/0.1 (+companion app; read-only)`. When the site cannot be reached, the deck shows its last good copy.

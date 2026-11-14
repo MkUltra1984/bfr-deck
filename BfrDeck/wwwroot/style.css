@@ -479,3 +479,5 @@ ol.moves { margin: 4px 0 6px; padding-left: 22px; } ol.moves li { margin: 3px 0;
 .kvrow.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); }
 .itemrow { display: grid; grid-template-columns: 32px minmax(0, 1fr) 80px minmax(0, 1fr); gap: 10px; align-items: center; padding: 4px 0; border-top: 1px solid var(--line); } .itemrow:first-child { border-top: 0; } .itemrow .num { text-align: right; font-weight: 700; }
 .msboxlist { margin: 8px 0; } .msboxlist .row { margin-bottom: 4px; } .boxrow { display: flex; align-items: center; gap: 10px; padding: 4px 0; border-top: 1px solid var(--line); color: var(--ink); } .boxrow:hover { text-decoration: none; background: var(--bg3); } .boxrow img { border-radius: 6px; flex: none; } .boxrow .grow { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .boxrow .num { min-width: 86px; text-align: right; }
+.sicon { width: 16px; height: 16px; margin: -3px 5px 0 0; vertical-align: middle; } .mstoday .chip { display: inline-flex; align-items: center; min-height: 26px; } .mstoday .chip .sicon { margin: 0 5px 0 0; }
+.mspanel .strip { align-items: start; }

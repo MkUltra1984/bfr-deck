@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2 (2026-11-14)
+
+- **Always live.** Signed in, the deck reads your account again by itself every five minutes and when you come back to its window. The "live" button that read the game screen is gone; the header shows your account's name.
+- **Home:** every value in the account row has its own symbol, like gems, Zel and Karma. "What next" moved off the main screen; a small Today line links to your to-do list, evolutions, challenge and story.
+
 ## 1.3.1 (2026-11-14)
 
 - **The unit scanner is gone.** Signing in reads your box from your account, exactly and in a second, so the screen scan is no longer needed. Without signing in, tick the units you own by hand. The first-start tour now ends with the sign-in.

@@ -57,7 +57,7 @@
 - **Dein Squad** mit den echten Kampf-Sprites, Kosten, Elementen und Leader Skill.
 - **Should I pull?** gibt für jedes offene Tor ein Urteil, gemessen an den Einheiten, die du schon hast; die Chancen sind einen Klick entfernt.
 - **Einheiten der Woche** und die aktuellen Banner mit ihrer Restzeit.
-- Mit eingeschalteten Live-Werten zeigt der Kopf deine Gems, Zel und Karma, gelesen aus einem Bild des Spielbildschirms.
+- Angemeldet zeigen Kopf und Kacheln dein Level, deine Gems, Zel und Karma aus deinem Konto, alle paar Minuten von selbst neu gelesen.
 
 ### Einheiten und Einheitenseiten
 
@@ -137,7 +137,6 @@
 | `bfrevive.net/units/u/<id>.json` | die Skills einer Einheit, wenn ihre Seite geöffnet wird oder eine Liste sie braucht | auf der Festplatte zwischengespeichert |
 | `cdn.bfrevive.net` | Icons, Sprites, Item- und Torbilder | 14 Tage zwischengespeichert, höchstens 300 MB |
 | die Tabs „BFRevived“ und „Wiki“ | bfrevive.net und das Brave-Frontier-Wiki, in einem eingebetteten Browser angezeigt wie in jedem Browser | nur wenn du sie öffnest |
-| das Emulatorfenster (freiwillig) | ein Bild des Bildschirms für Live-Werte, gelesen mit der Texterkennung von Windows | nur solange eingeschaltet |
 | `github.com/MkUltra1984/bfr-deck` | die Update-Prüfung | beim Start und alle 6 Stunden |
 
 Anfragen des Decks geben sich als `BfrDeck/0.1 (+companion app; read-only)` zu erkennen. Ist die Seite nicht erreichbar, zeigt das Deck seine letzte gute Kopie.

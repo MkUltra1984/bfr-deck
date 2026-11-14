@@ -19,7 +19,7 @@ function renderHome(view, arg) {
   if (arg && DATA.summons) { const want = Number(arg); pullGate = want || null; }
   const head = h('div', { class: 'top', id: 'home-top' });
   const tiles = h('div', { class: 'tiles' },
-    tile('Gems', '—', 'turn on live to read', 'gems'), tile('Zel', '—', '', 'zel'), tile('Karma', '—', '', 'karma'),
+    tile('Gems', '—', 'sign in to see', 'gems'), tile('Zel', '—', '', 'zel'), tile('Karma', '—', '', 'karma'),
     timerTile(RULES.resets[0]), timerTile(RULES.resets[1]), timerTile(RULES.resets[2]),
     squadTile(view), pullTile(now), featuredTile(now), vortexTile(now));
   // the account panel (My Summoner) is the first tile; it redraws itself and the header after sign-in, refresh and sign-out
@@ -54,21 +54,21 @@ async function refreshHead(head, tiles) {
   // Name: what you typed, else the name read from the game's header while live is on, else "Summoner".
   const typed = store.get('profileName', '');
   if (!typed && live && live.name) store.set('liveName', live.name);
-  const name = typed || store.get('liveName', '') || 'Summoner';
+  const name = typed || (MS.home && MS.home.player && MS.home.player.name) || store.get('liveName', '') || 'Summoner';   // your account's name when signed in
   // Avatar: the selected squad's leader; Omni Vargas until one is set.
   const avatar = lead || 10017;
   head.replaceChildren(
     h('div', { class: 'ring' }, h('img', { src: unitIcon(avatar), alt: '', onerror: e => { e.target.style.visibility = 'hidden'; } })),
-    h('div', {}, h('div', { class: 'name', title: 'Click to change the name (empty = read it from the game)', onclick: () => { const n = prompt('Your summoner name (leave empty to read it from the game header)', typed); if (n != null) { store.set('profileName', n.trim()); refreshHead(head, tiles); } } }, name,
+    h('div', {}, h('div', { class: 'name', title: 'Click to change the name (empty = read it from the game)', onclick: () => { const n = prompt('Your summoner name (leave empty to use the name of your account)', typed); if (n != null) { store.set('profileName', n.trim()); refreshHead(head, tiles); } } }, name,
         h('span', { class: 'sub' }, live && live.level ? ` Lv ${live.level}` : '')),
-      h('div', { class: 'sub' }, !s ? 'desktop app only' : !s.bluestacks ? 'BlueStacks not running' : [h('span', { class: warn ? 'red' : 'green' }, `BlueStacks ${timeLeft(Math.floor(hrs * 3600))}`), live ? (live.ok ? ' · live stats on' : ` · ${live.error || 'reading…'}`) : ' · live stats off'])),
-    h('div', { class: 'right' }, h('button', { class: 'icon', title: 'Snap beside BlueStacks', onclick: () => host.send('dock') }, 'dock'),
-      h('button', { class: live ? 'icon on' : 'icon', title: 'Read level, gems, Zel and Karma from the game window (screen capture through adb, off by default, never sends input)', onclick: () => { host.send(live ? 'liveoff' : 'liveon'); setTimeout(() => refreshHead(head, tiles), 600); } }, live ? 'live' : 'live off')));
+      h('div', { class: 'sub' }, !s ? 'desktop app only' : !s.bluestacks ? 'BlueStacks not running' : [h('span', { class: warn ? 'red' : 'green' }, `BlueStacks ${timeLeft(Math.floor(hrs * 3600))}`), ''])),
+    h('div', { class: 'right' }, h('button', { class: 'icon', title: 'Snap beside BlueStacks', onclick: () => host.send('dock') }, 'dock')));
+  if (live) host.send('liveoff');   // the screen reader is retired: the account is the live source
   if (warn) head.append(h('div', { class: 'warnline' }, 'Over 3 h: the FAQ warns of a BlueStacks memory leak that can corrupt saves. Close it fully soon.'));
   for (const [key, val, sub] of [['gems', live && live.gems, 'summons, slots, revives'], ['zel', live && live.zel, 'Gold Valley on Thursday'], ['karma', live && live.karma, '1,000,000 per Omni evolution']]) {
     const t = tiles.querySelector(`[data-k=${key}]`); if (!t) continue;
     t.querySelector('.v').textContent = val != null ? fmt(val) : '—';
-    t.querySelector('.s').textContent = val != null ? sub : (live ? 'open the home screen in game' : 'turn on live to read');
+    t.querySelector('.s').textContent = val != null ? sub : 'sign in to see';
   }
   msTiles(tiles, head);   // signed in: currencies and level come from the account
   clearTimeout(head._t); head._t = setTimeout(() => { if (head.isConnected) refreshHead(head, tiles); }, 5000);
