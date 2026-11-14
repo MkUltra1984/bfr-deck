@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3 (2026-11-14)
+
+- The header's emulator line only shows while the emulator is running.
+
 ## 1.3.2 (2026-11-14)
 
 - **Always live.** Signed in, the deck reads your account again by itself every five minutes and when you come back to its window. The "live" button that read the game screen is gone; the header shows your account's name.

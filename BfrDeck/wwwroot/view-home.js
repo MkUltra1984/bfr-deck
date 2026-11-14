@@ -61,7 +61,7 @@ async function refreshHead(head, tiles) {
     h('div', { class: 'ring' }, h('img', { src: unitIcon(avatar), alt: '', onerror: e => { e.target.style.visibility = 'hidden'; } })),
     h('div', {}, h('div', { class: 'name', title: 'Click to change the name (empty = read it from the game)', onclick: () => { const n = prompt('Your summoner name (leave empty to use the name of your account)', typed); if (n != null) { store.set('profileName', n.trim()); refreshHead(head, tiles); } } }, name,
         h('span', { class: 'sub' }, live && live.level ? ` Lv ${live.level}` : '')),
-      h('div', { class: 'sub' }, !s ? 'desktop app only' : !s.bluestacks ? 'BlueStacks not running' : [h('span', { class: warn ? 'red' : 'green' }, `BlueStacks ${timeLeft(Math.floor(hrs * 3600))}`), ''])),
+      h('div', { class: 'sub' }, !s ? 'desktop app only' : !s.bluestacks ? '' : [h('span', { class: warn ? 'red' : 'green' }, `BlueStacks ${timeLeft(Math.floor(hrs * 3600))}`), ''])),
     h('div', { class: 'right' }, h('button', { class: 'icon', title: 'Snap beside BlueStacks', onclick: () => host.send('dock') }, 'dock')));
   if (live) host.send('liveoff');   // the screen reader is retired: the account is the live source
   if (warn) head.append(h('div', { class: 'warnline' }, 'Over 3 h: the FAQ warns of a BlueStacks memory leak that can corrupt saves. Close it fully soon.'));
