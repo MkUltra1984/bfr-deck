@@ -39,6 +39,7 @@ function msApply() {
   // tier and power come with the compact box (columns named by the service)
   const extra = new Map();
   if (MS.box && MS.box.columns && MS.box.rows) { const c = MS.box.columns, iu = c.indexOf('user_unit_id'), ip = c.indexOf('power'), it = c.indexOf('tier'); for (const r of MS.box.rows) extra.set(r[iu], { power: ip >= 0 ? r[ip] : null, tier: it >= 0 ? r[it] : null }); }
+  MS.items = new Map(((MS.profile && MS.profile.items) || []).map(i => [Number(i.item_id), i]));
   MS.byUnit = new Map(); const counts = {};
   for (const u of units) { const id = Number(u.unit_id); if (!id) continue; counts[id] = (counts[id] || 0) + 1; if (!MS.byUnit.has(id)) MS.byUnit.set(id, []); MS.byUnit.get(id).push({ ...u, ...(extra.get(u.user_unit_id) || {}) }); }
   if (!units.length) return;
@@ -142,7 +143,8 @@ function msPanel(redraw) {
   box.append(
     h('div', { class: 'strip' }, stat('Level', fmt(P.level), `${fmt(P.exp_to_next)} EXP to next`), stat('Energy', `${P.energy.now} / ${P.energy.max}`, full), stat('Arena orbs', `${P.arena_orbs.now} / ${P.arena_orbs.max}`), stat('Gifts', fmt(P.presents_waiting), P.presents_waiting ? 'waiting' : ''),
       stat('Unit box', `${fmt(P.unit_box.used)} / ${fmt(P.unit_box.capacity)}`, over ? 'Full' : '', over ? 'red' : ''), stat('Cost cap', fmt(P.deck_cost_cap))),
-    next.length ? h('div', { class: 'msnext' }, h('div', { class: 'row' }, h('span', { class: 'k grow' }, 'What next'), h('a', { class: 'faint', href: '#/account/todo' }, `See all ${all} ›`)), rows) : null);
+    next.length ? h('div', { class: 'msnext' }, h('div', { class: 'row' }, h('span', { class: 'k grow' }, 'What next'), h('a', { class: 'faint', href: '#/account/todo' }, `See all ${all} ›`)), rows) : null,
+    msToday(H));
   return box;
 }
 // Header buttons and compact tiles while signed in (called by refreshHead every few seconds).
@@ -169,7 +171,10 @@ function copiesSection(id) {
     h('span', { class: 'dim' }, ` ${u.type || ''} · BB ${u.bb_level}${u.sbb_level ? ` · SBB ${u.sbb_level}` : ''}`),
     u.imps && (u.imps.hp || u.imps.atk || u.imps.def || u.imps.rec) ? h('span', { class: 'dim' }, ` · imps HP ${u.imps.hp} ATK ${u.imps.atk} DEF ${u.imps.def} REC ${u.imps.rec}`) : null,
     h('div', { class: 'faint' }, `Spheres: ${(u.spheres || []).length ? u.spheres.map(sphereName).join(', ') : `none equipped (${u.sphere_slots || 0} slot${u.sphere_slots === 1 ? '' : 's'})`}`,
-      u.sp ? ` · SP ${u.sp.spent} spent, ${u.sp.available} free of ${u.sp.max}` : ''), copyReport(u.user_unit_id));
+      u.sp ? ` · SP ${u.sp.spent} spent, ${u.sp.available} free of ${u.sp.max}` : ''),
+    (u.extra_skills || []).length ? h('div', { class: 'faint' }, 'Extra skills: ' + u.extra_skills.map(x => (x && (x.name || x.desc)) || String(x)).join(' · ')) : null,
+    u.sp && (u.sp.options || []).length ? h('div', { class: 'faint' }, 'SP bought: ' + u.sp.options.map(x => (x && (x.name || x.desc)) || String(x)).join(' · ')) : null,
+    copyReport(u.user_unit_id));
   // one line at a glance; every copy behind a tap
   return h('details', { class: 'box mscopies' },
     h('summary', {}, h('b', {}, `You own ${list.length} cop${list.length === 1 ? 'y' : 'ies'}`), h('span', { class: 'dim' }, ` · best Lv ${top.level}/${top.max_level} · BB ${top.bb_level} · ${(top.spheres || []).length} sphere${(top.spheres || []).length === 1 ? '' : 's'} equipped${top.sp ? ` · ${top.sp.available} SP free` : ''}`),
@@ -288,7 +293,8 @@ function msAdvice(id) {
   const top = [...list].sort((a, b) => b.level - a.level || b.bb_level - a.bb_level)[0];
   const out = h('div', { class: 'copyreport' });
   renderReport(out, top.user_unit_id);
-  return h('div', { class: 'sphbox' }, h('h2', {}, "My Summoner's advice"), h('p', { class: 'faint', style: 'margin:0 0 8px' }, `For your ${list.length > 1 ? 'best ' : ''}copy (Lv ${top.level}/${top.max_level}), worked out by My Summoner from your own account.`), out);
+  return h('div', { class: 'sphbox' }, h('h2', {}, "My Summoner's advice"), h('p', { class: 'faint', style: 'margin:0 0 8px' }, `For your ${list.length > 1 ? 'best ' : ''}copy (Lv ${top.level}/${top.max_level}), worked out by My Summoner from your own account. `,
+    h('a', { href: '#/account/build', onclick: () => { ACC.buildUnit = top.user_unit_id; ACC.buildName = top.name; ACC.theme = 'build_around'; } }, 'Build a team around it ›')), out);
 }
 // A block the deck works out itself gets a clear mark while you are signed in: it is not from My Summoner.
 function deckEstimate(el, why) {
@@ -321,6 +327,40 @@ function msTierBlock() {
       for (const r of rows) { const id = Number(r[iu]); if (!seen.has(id)) { seen.add(id); ids.push([id, r[ip], r[il]]); } }
       return h('details', { class: 'evorow', open: t === 'S' || t === 'A' ? '' : null }, h('summary', {}, h('span', { class: 'tag gold' }, `tier ${t}`), h('span', { class: 'grow dim' }, ` ${ids.length} unit${ids.length === 1 ? '' : 's'}`)),
         h('div', { class: 'tierunits' }, ids.slice(0, 40).map(([id, pw, lv]) => h('a', { class: 'mini', href: `#/units/${id}`, title: `${unitName(id)} · power ${pw} · Lv ${lv}` }, h('img', { src: unitIcon(id), alt: unitName(id), width: 44, height: 44, loading: 'lazy' }))), ids.length > 40 ? h('span', { class: 'faint' }, ` +${ids.length - 40} more`) : null)); }));
+}
+
+// Home, one row under "What next": today's pointers from My Summoner (an evolution that is ready, a challenge, story).
+function msToday(H) {
+  const T = (H && H.today) || {}, S = (H && H.story) || {}, chips = [];
+  if (T.evolution && T.evolution.ready) chips.push(h('a', { class: 'chip', href: '#/account/evolve', title: T.evolution.unit ? `${T.evolution.unit.name}: ${T.evolution.unit.reason}` : '' }, `Evolve: ${T.evolution.ready} ready`));
+  if (T.challenge && T.challenge.pick) chips.push(h('a', { class: 'chip', href: '#/account/challenges', title: T.challenge.pick.why || '' }, `Challenge: ${T.challenge.pick.title}`));
+  if (S.percent != null) chips.push(h('a', { class: 'chip', href: '#/account/story', title: S.quest ? `Next: ${S.quest.name} (${S.quest.area_name})` : '' }, `Story ${S.percent}%`));
+  return chips.length ? h('div', { class: 'row mstoday' }, h('span', { class: 'k' }, 'Today'), chips) : null;
+}
+// Item pages: how many of this item your account holds.
+function stockTag(id) {
+  if (!MS.profile) return null;
+  const i = MS.items && MS.items.get(Number(id));
+  return i ? h('span', { class: 'tag green' }, `you have ${fmt(i.owned ?? i.stock)}${i.worn ? `, ${i.worn} worn` : ''}`) : h('span', { class: 'tag' }, 'you have none');
+}
+// Units > Your box: every copy you own with My Summoner's tier and power, sortable and filterable.
+const BOXLIST = { sort: 'power', tier: '', shown: 60 };
+function msBoxList() {
+  const B = MS.box; if (!B || !B.columns || !B.rows) return null;
+  const c = B.columns, col = k => c.indexOf(k), I = { uu: col('user_unit_id'), id: col('unit_id'), rar: col('rarity'), lv: col('level'), max: col('max_level'), pow: col('power'), tier: col('tier'), bb: col('bb_level'), lock: col('locked') };
+  const box = h('div', { class: 'box msboxlist' });
+  const draw = () => {
+    const keyOf = { power: r => r[I.pow] || 0, level: r => r[I.lv] || 0, rarity: r => r[I.rar] || 0 }[BOXLIST.sort];
+    const rows = B.rows.filter(r => !BOXLIST.tier || r[I.tier] === BOXLIST.tier).sort((a, b) => keyOf(b) - keyOf(a) || (b[I.pow] || 0) - (a[I.pow] || 0));
+    const chip = (on, label, fn) => h('button', { class: on ? 'chip on' : 'chip', onclick: fn }, label);
+    box.replaceChildren(h('div', { class: 'row' }, h('b', {}, `Your ${fmt(B.rows.length)} units`), h('span', { class: 'faint' }, 'tier and power from My Summoner'), h('span', { class: 'grow' }),
+        h('span', { class: 'faint' }, 'sort'), ['power', 'level', 'rarity'].map(k => chip(BOXLIST.sort === k, k, () => { BOXLIST.sort = k; draw(); }))),
+      h('div', { class: 'row' }, h('span', { class: 'faint' }, 'tier'), chip(!BOXLIST.tier, 'all', () => { BOXLIST.tier = ''; BOXLIST.shown = 60; draw(); }), ['S', 'A', 'B', 'C', 'D'].map(t => chip(BOXLIST.tier === t, t, () => { BOXLIST.tier = t; BOXLIST.shown = 60; draw(); }))),
+      rows.slice(0, BOXLIST.shown).map(r => h('a', { class: 'boxrow', href: `#/units/${Number(r[I.id])}` }, h('img', { src: unitIcon(Number(r[I.id])), alt: '', width: 32, height: 32, loading: 'lazy' }), h('span', { class: 'grow' }, unitName(Number(r[I.id]))),
+        h('span', { class: 'faint' }, `Lv ${r[I.lv]}/${r[I.max]} · BB ${r[I.bb]}`), h('span', { class: 'tag gold' }, `tier ${r[I.tier] || '-'}`), h('span', { class: 'num' }, `power ${r[I.pow] ?? '-'}`))),
+      rows.length > BOXLIST.shown ? h('button', { class: 'chip', onclick: () => { BOXLIST.shown += 100; draw(); } }, `Show more (${rows.length - BOXLIST.shown} left)`) : null);
+  };
+  draw(); return box;
 }
 
 // Start: read the account if a login is remembered or a session is open; redraw Home when it arrives.

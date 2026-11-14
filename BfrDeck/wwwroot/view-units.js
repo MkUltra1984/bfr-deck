@@ -78,7 +78,7 @@ function renderBox(view) {
   const st = collectionStats();
   const bar = (o, t) => h('div', { class: 'bar' }, h('div', { class: 'fill', style: `width:${t ? (100 * o / t) : 0}%` }), h('span', {}, `${o} / ${t}`));
   const scannedAt = store.get('boxScannedAt', 0); const boxTotal = store.get('boxTotal', 0);
-  view.replaceChildren(h('div', {}, backLink('#/units'), h('h1', {}, 'Your box'),
+  view.replaceChildren(h('div', {}, backLink('#/units'), h('h1', {}, 'Your box'), msBoxList(),
     h('div', { class: 'box' }, h('div', { class: 'row' }, h('b', {}, `${st.owned} of ${st.total} units`), h('span', { class: 'faint' }, `${(100 * st.owned / Math.max(1, st.total)).toFixed(1)}% of the collection`),
       h('span', { class: 'grow' }), h('a', { class: 'chip', href: '#/scan' }, scannedAt ? 'Rescan units' : 'Scan my units'), h('span', { class: 'faint' }, scannedAt ? `last scan ${when(scannedAt)}` : 'or tick ✔ on unit cards'),
       h('button', { class: 'chip', title: 'Show the first-start introduction again', onclick: () => showIntro(true) }, 'intro')), bar(st.owned, st.total),

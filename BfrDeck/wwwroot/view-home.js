@@ -76,6 +76,9 @@ async function refreshHead(head, tiles) {
 
 // ---- squad
 function squadTile(view) {
+  // signed in: Home shows only the squads that really exist in the account; plans made in the deck live in the Team Builder
+  const onlyLive = COLL.squads.some(x => x.live);
+  if (onlyLive && !COLL.squad().live) { COLL.active = COLL.squads.findIndex(x => x.live); COLL.save(); }
   const s = COLL.squad(); const si = COLL.active;
   const meta = h('span', {}, '…');
   const sq = h('div', { class: 'sq' }, s.units.map((id, slot) => {
@@ -83,7 +86,7 @@ function squadTile(view) {
     return h('a', { class: `u el-${unitElement(id)}${slot === 0 ? ' lead' : ''}`, href: `#/units/${id}`, title: unitName(id) }, spriteCanvas(id, 170, { maxScale: 1.0, height: 80, mass: true, fitWidth: 88 }), h('span', { class: 'aname' }, shortUnitName(id)));
   }));
   analyseSquad(s.units).then(a => { meta.textContent = `cost ${a.cost} · ${a.elements.size} element${a.elements.size === 1 ? '' : 's'}${a.leader && a.leader.ls ? ' · LS ' + a.leader.ls.name : ''}`; });
-  return h('div', { class: 'tile wide stagetile' }, h('h4', {}, h('span', { class: 'row' }, COLL.squads.map((x, i) => h('button', { class: i === si ? 'chip on' : 'chip', onclick: () => { COLL.active = i; COLL.save(); renderHome(view); } }, x.name)), h('a', { class: 'faint', href: '#/team' }, 'edit ›')), meta), sq, liveVerdict(s), gearBlock(s));
+  return h('div', { class: 'tile wide stagetile' }, h('h4', {}, h('span', { class: 'row' }, COLL.squads.map((x, i) => (onlyLive && !x.live ? null : h('button', { class: i === si ? 'chip on' : 'chip', onclick: () => { COLL.active = i; COLL.save(); renderHome(view); } }, onlyLive ? x.name.replace(/^Live /, '') : x.name))), h('a', { class: 'faint', href: '#/team' }, onlyLive ? 'plans ›' : 'edit ›')), meta), sq, liveVerdict(s), gearBlock(s));
 }
 
 // ---- should I pull: cycles through this week's banners (and the permanent gem gates); always shows the

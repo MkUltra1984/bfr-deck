@@ -6,11 +6,12 @@
 //   History     login and play streak, clears per mode, most-played missions, activity per day
 // Each sub-tab asks the host for its own part when opened (kept for a minute by the host).
 
-const ACCOUNT_TABS = [['todo', 'To do'], ['squads', 'Squads'], ['build', 'Build a team'], ['evolve', 'Evolve'], ['challenges', 'Challenges'], ['story', 'Story'], ['collection', 'Collection'], ['history', 'History']];
-const ACC = { evoFilter: 'all', evoView: 'units', evoShown: 40, chFilter: '', squad: '', theme: '' };
+const ACCOUNT_TABS = [['todo', 'To do'], ['squads', 'Squads'], ['build', 'Build a team'], ['evolve', 'Evolve'], ['challenges', 'Challenges'], ['story', 'Story'], ['collection', 'Collection'], ['items', 'Items'], ['history', 'History'], ['profile', 'Profile']];
+const ACC = { evoFilter: 'all', evoView: 'units', evoShown: 40, chFilter: '', squad: '', theme: '', friend: 0, buildUnit: 0, targets: new Set() };
 
 async function renderAccount(view, arg) {
-  if (arg === 'probe') return accProbe(view);   // #/account/probe: support, writes the shape of the less known parts to the log
+  if (arg === 'probe') return accProbe(view);
+  if (arg === 'selftest') return accSelfTest(view);   // #/account/selftest: support, tries the buttons and writes the outcome to the log   // #/account/probe: support, writes the shape of the less known parts to the log
   const tab = ACCOUNT_TABS.some(t => t[0] === arg) ? arg : 'todo';
   const head = h('div', {}, h('h1', {}, 'My Account'));
   if (!(MS.home && MS.home.player)) {
@@ -31,6 +32,8 @@ async function renderAccount(view, arg) {
     else if (tab === 'build') await accBuild(body);
     else if (tab === 'story') accStory(body, await msPart('progress'));
     else if (tab === 'collection') accCollection(body, await msPart('collection'));
+    else if (tab === 'items') accItems(body);
+    else if (tab === 'profile') accProfile(body);
     else accHistory(body, await msPart('history'));
   } catch (e) {
     body.replaceChildren(h('div', { class: 'box' }, h('p', { class: 'red' }, e.status === 401 ? 'You are signed out.' : 'Could not reach your account. ' + (e.message || '')),
@@ -55,13 +58,21 @@ function accEvolve(body, d) {
     const bar = h('div', { class: 'row' }, chip('all', `All ${counts.total ?? units.length}`), chip('ready', `Ready ${counts.ready ?? 0}`), chip('short', `Short ${counts.short ?? 0}`), counts.blocked ? chip('blocked', `Blocked ${counts.blocked}`) : null,
       h('span', { class: 'grow' }), viewChip('units', 'By unit'), viewChip('shop', 'Shopping list'));
     const hint = h('p', { class: 'faint' }, 'Plan to evolve your units. Green means you can do it now.');
-    if (ACC.evoView === 'shop') { body.replaceChildren(hint, bar, evoShopping(d && d.shopping_list)); return; }
+    if (ACC.evoView === 'shop') {
+      const box = h('div', {}), mine = ACC.targets.size;
+      const note = h('p', { class: 'faint' }, mine ? `For the ${mine} unit${mine === 1 ? '' : 's'} you picked. ` : 'For the units in your squads. Pick your own in "By unit" with the + list button (up to 20). ', mine ? h('button', { class: 'chip', onclick: () => { ACC.targets.clear(); draw(); } }, 'clear my picks') : null);
+      body.replaceChildren(hint, bar, note, box);
+      if (mine) { box.append(h('p', { class: 'dim' }, 'Adding it up…')); msPart('evolutions?targets=' + [...ACC.targets].join(',')).then(x => box.replaceChildren(evoShopping(x && x.shopping_list))).catch(e => box.replaceChildren(h('p', { class: 'red' }, 'No shopping list: ' + e.message))); }
+      else box.append(evoShopping(d && d.shopping_list));
+      return;
+    }
     const list = units.filter(u => ACC.evoFilter === 'all' || u.status === ACC.evoFilter)
       .sort((a, b) => (a.status === 'ready' ? 0 : 1) - (b.status === 'ready' ? 0 : 1) || (a.short_by || 0) - (b.short_by || 0) || (b.rarity || 0) - (a.rarity || 0) || (b.level || 0) - (a.level || 0));
     const have = (need, held) => h('span', { class: held >= need ? 'green' : 'red' }, `${fmt(held)} / ${fmt(need)}`);
     const row = u => h('details', { class: 'evorow' },
       h('summary', {}, h('img', { src: unitIcon(Number(u.unit_id)), alt: '', width: 36, height: 36, loading: 'lazy' }),
         h('span', { class: 'grow' }, h('b', {}, u.name), h('span', { class: 'dim' }, ` → ${(u.target && u.target.name) || '?'} ${(u.target && u.target.rarity_label) || ''}`), h('span', { class: 'faint' }, ` · Lv ${u.level}/${u.max_level}`)),
+        h('button', { class: ACC.targets.has(u.user_unit_id) ? 'chip on' : 'chip', title: 'Put this unit on your shopping list', onclick: e => { e.preventDefault(); e.stopPropagation(); if (ACC.targets.has(u.user_unit_id)) ACC.targets.delete(u.user_unit_id); else if (ACC.targets.size < 20) ACC.targets.add(u.user_unit_id); else toast('The shopping list takes up to 20 units'); e.currentTarget.className = ACC.targets.has(u.user_unit_id) ? 'chip on' : 'chip'; e.currentTarget.textContent = ACC.targets.has(u.user_unit_id) ? '✓ on list' : '+ list'; } }, ACC.targets.has(u.user_unit_id) ? '✓ on list' : '+ list'),
         h('span', { class: 'tag ' + (u.status === 'ready' ? 'green' : u.status === 'short' ? 'gold' : 'red') }, u.status === 'ready' ? 'Ready' : u.status === 'short' ? `Short: ${u.short_by || '?'}` : 'Blocked')),
       h('div', { class: 'evobody' }, h('p', {}, u.reason || ''),
         (u.materials || []).map(m => h('div', { class: 'kvrow' }, h('span', {}, m.name), have(m.need, m.usable ?? m.held), m.where && m.where.text ? h('span', { class: 'faint' }, m.where.text) : null)),
@@ -114,6 +125,7 @@ function accHistory(body, d) {
     h('div', { class: 'cols' }, big('Login streak', `${L.streak ?? 0} days`, `${L.login_days ?? 0} login days in total`), big('Play streak', `${L.play_streak ?? 0} days`, 'days in a row with a battle')),
     h('h2', {}, 'Last 14 days'), days.length ? h('div', { class: 'box daybars' }, days.map(x => h('div', { class: 'daybar', title: `${fmtWhen.format(new Date(x.day * 1000)).split(',')[0]}: ${x.runs} runs` }, h('i', { style: `height:${Math.round(100 * (x.runs || 0) / max)}%` }), h('span', {}, String(x.runs || 0))))) : h('p', { class: 'dim' }, 'No play history yet.'),
     h('h2', {}, 'Most played'), top.length ? h('div', { class: 'box' }, top.map(m => h('div', { class: 'kvrow' }, h('span', {}, m.name, h('span', { class: 'faint' }, m.area_name ? ` · ${m.area_name}` : '')), h('span', { class: 'bar' }, h('span', { class: 'fill', style: `width:${Math.round(100 * m.clears / topMax)}%` }), h('span', {}, `${fmt(m.clears)} clears`))))) : h('p', { class: 'dim' }, 'No play history yet.'),
+    accHistoryMore(d),
     h('h2', {}, 'By mode'), h('div', { class: 'box' }, ((d && d.modes) || []).map(m => h('div', { class: 'kvrow' }, h('span', {}, m.label), h('span', {}, `${fmt(m.quests_cleared)} quests cleared`), h('span', { class: 'faint' }, `${fmt(m.runs_90_days)} runs in 90 days`)))));
 }
 
@@ -136,16 +148,23 @@ async function accSquads(body) {
   if (!set.length) { body.replaceChildren(h('p', { class: 'dim' }, 'No squad with units in it yet.')); return; }
   if (!set.some(s => key(s) === ACC.squad)) ACC.squad = key(set.find(s => s.deck_type === 1 && s.number === MS.squads.active) || set[0]);
   const s = set.find(x => key(x) === ACC.squad);
-  const chips = h('div', { class: 'row' }, set.map(x => h('button', { class: key(x) === ACC.squad ? 'chip on' : 'chip', onclick: () => { ACC.squad = key(x); accSquads(body); } }, x.label)));
+  const chips = h('div', { class: 'row' }, set.map(x => h('button', { class: key(x) === ACC.squad ? 'chip on' : 'chip', onclick: () => { ACC.squad = key(x); ACC.friend = 0; accSquads(body); } }, x.label)));
   const out = h('div', {}, h('p', { class: 'dim' }, 'Reading this squad…'));
   body.replaceChildren(h('p', { class: 'faint' }, 'Your squads as they are in the game: what each one covers, who is not ready, and which of your spheres to put where.'), chips, out);
-  const q = `?kind=${encodeURIComponent(s.kind_param)}`;
-  const [d, plan] = await Promise.all([msPart(`squads/${s.number}${q}`), msPart(`squads/${s.number}/spheres${q}`).catch(() => null)]);
-  if (ACC.squad !== key(s)) return;
+  const q = `?kind=${encodeURIComponent(s.kind_param)}`, friend = ACC.friend;
+  const [d, plan] = await Promise.all([msPart(`squads/${s.number}${q}${friend ? '&friend=' + friend : ''}`), msPart(`squads/${s.number}/spheres${q}`).catch(() => null)]);
+  if (ACC.squad !== key(s) || ACC.friend !== friend) return;
+  // try a friend leader (My Summoner works the squad out again with that unit as friend), and share the squad as text
+  const tools = h('div', { class: 'row' },
+    h('button', { class: 'chip', onclick: async () => { const id = await pickUnit({ title: 'Friend leader to try', hint: 'Any unit: My Summoner checks the squad again with it as your friend leader.' }); if (id) { ACC.friend = id; accSquads(body); } } }, friend ? 'try another friend leader' : 'try a friend leader'),
+    friend ? h('span', { class: 'tag gold' }, `with friend: ${unitName(friend)}`) : null, friend ? h('button', { class: 'chip', onclick: () => { ACC.friend = 0; accSquads(body); } }, 'without friend') : null,
+    h('span', { class: 'grow' }),
+    h('button', { class: 'chip', title: 'Copy this squad as text, to paste into Discord', onclick: async () => { const lines = [`${s.label} · cost ${s.cost}/${s.cap}`, ...(d.members || []).map(m => `${m.leader ? '★' : '·'} ${m.name} (Lv ${m.readiness ? m.readiness.level + '/' + m.readiness.max_level : '?'}${m.tier ? ', tier ' + m.tier : ''})`), friend ? `Friend: ${unitName(friend)}` : '', s.line || ''].filter(Boolean);
+      try { await navigator.clipboard.writeText(lines.join('\n')); toast('Squad copied as text'); } catch { toast('Could not copy to the clipboard'); } } }, 'share my squad'));
   const member = m => h('div', { class: 'kvrow' }, h('a', { href: `#/units/${Number(m.unit_id)}` }, m.name, m.leader ? h('span', { class: 'tag gold' }, 'leader') : null),
     h('span', {}, m.tier ? h('span', { class: 'tag' }, `tier ${m.tier}`) : null, m.readiness && m.readiness.ready ? h('span', { class: 'tag green' }, 'ready') : h('span', { class: 'tag gold' }, 'not ready')),
     h('span', { class: 'faint' }, ((m.readiness && m.readiness.notes) || []).join(' · ')));
-  out.replaceChildren(
+  out.replaceChildren(tools,
     h('h2', {}, 'What it covers'), covRows(d.coverage) || h('p', { class: 'dim' }, 'No rating for this squad.'),
     h('h2', {}, 'Members'), h('div', { class: 'box' }, (d.members || []).map(member)),
     h('h2', {}, 'Sphere plan'), plan && (plan.moves || []).length ? h('div', { class: 'box' }, h('p', { class: 'faint' }, [plan.within, plan.notice].filter(Boolean).join(' ')),
@@ -156,17 +175,25 @@ async function accSquads(body) {
 async function accBuild(body) {
   const T = ((await msPart('builder')).themes || []);
   const free = T.filter(t => !t.needs_unit);
-  if (!free.some(t => t.theme === ACC.theme)) ACC.theme = (free[0] || {}).theme || '';
-  const chips = h('div', { class: 'row' }, free.map(t => h('button', { class: t.theme === ACC.theme ? 'chip on' : 'chip', onclick: () => { ACC.theme = t.theme; accBuild(body); } }, t.label)));
+  if (!T.some(t => t.theme === ACC.theme)) ACC.theme = (free[0] || T[0] || {}).theme || '';
+  const cur = T.find(t => t.theme === ACC.theme) || {};
+  // a theme that starts from one of your units asks which one (your best copy of the unit you pick)
+  const pickAround = async () => { const id = await pickUnit({ title: 'Build around which unit?', onlyOwned: true, hint: 'One of your units; the team is built to make the most of it.' }); if (!id) return false; const c = (MS.byUnit.get(Number(id)) || []).slice().sort((a, b) => b.level - a.level)[0]; if (!c) { toast('You do not own that unit'); return false; } ACC.buildUnit = c.user_unit_id; ACC.buildName = c.name; return true; };
+  const chips = h('div', { class: 'row' }, T.map(t => h('button', { class: t.theme === ACC.theme ? 'chip on' : 'chip', onclick: async () => { if (t.needs_unit && !(await pickAround())) return; ACC.theme = t.theme; accBuild(body); } }, t.label)));
   const out = h('div', {}, h('p', { class: 'dim' }, 'Building…'));
   body.replaceChildren(h('p', { class: 'faint' }, 'Pick what the team is for; My Summoner builds it from the units you own and says why each one is in.'), chips, out);
   if (!ACC.theme) { out.replaceChildren(h('p', { class: 'dim' }, 'No team themes available.')); return; }
-  const theme = ACC.theme, d = await msPart('builder/' + theme);
+  if (cur.needs_unit && !ACC.buildUnit) { out.replaceChildren(h('button', { class: 'primary', onclick: async () => { if (await pickAround()) accBuild(body); } }, 'Pick the unit to build around')); return; }
+  const theme = ACC.theme, d = await msPart('builder/' + theme + (cur.needs_unit ? '?unit=' + ACC.buildUnit : ''));
   if (ACC.theme !== theme) return;
   const who = (m, lead) => h('div', { class: 'buildrow' }, h('a', { href: `#/units/${Number(m.unit_id)}` }, h('img', { src: unitIcon(Number(m.unit_id)), alt: '', width: 40, height: 40, loading: 'lazy' })),
     h('div', {}, h('b', {}, m.name), lead ? h('span', { class: 'tag gold' }, 'leader') : null, h('span', { class: 'faint' }, ` Lv ${m.level}/${m.max_level}`), m.ready ? null : h('span', { class: 'tag gold' }, 'not levelled'),
       h('p', {}, m.why || ''), (m.alternates || []).length ? h('p', { class: 'faint' }, 'Could also be: ' + m.alternates.map(a => a.name).join(', ')) : null));
+  const team = [d.leader, ...(d.members || []).filter(m => !d.leader || m.user_unit_id !== d.leader.user_unit_id)].filter(Boolean);
   out.replaceChildren(
+    h('div', { class: 'row' }, cur.needs_unit ? [h('span', { class: 'tag gold' }, `around ${ACC.buildName || 'your unit'}`), h('button', { class: 'chip', onclick: async () => { if (await pickAround()) accBuild(body); } }, 'another unit')] : null, h('span', { class: 'grow' }),
+      team.length ? h('button', { class: 'chip', title: 'Put this team into the Team Builder as a plan you can change', onclick: () => { const name = `Plan: ${d.label || cur.label || 'team'}`; const units = team.slice(0, 5).map(m => Number(m.unit_id)); while (units.length < 5) units.push(null);
+        const i = COLL.squads.findIndex(x => !x.live && x.name === name); const sq = { name, units, friend: null, spheres: {} }; if (i >= 0) COLL.squads[i] = sq; else COLL.squads.push(sq); COLL.active = i >= 0 ? i : COLL.squads.length - 1; COLL.save(); location.hash = '#/team'; } }, 'open in Team Builder') : null),
     d.status && d.status !== 'ok' ? h('p', { class: 'red' }, d.missing || `This team cannot be built from your box (${d.status}).`) : null,
     h('div', { class: 'box' }, d.leader ? who(d.leader, true) : null, (d.members || []).filter(m => !d.leader || m.user_unit_id !== d.leader.user_unit_id).map(m => who(m, false))),
     d.friend_tip && (d.friend_tip.why || d.friend_tip.look_for) ? h('p', { class: 'sphneed' }, h('b', {}, 'Friend leader: '), [d.friend_tip.look_for, d.friend_tip.why].filter(Boolean).join(' ')) : null,
@@ -195,6 +222,42 @@ function accCollection(body, d) {
     group('By element', d.by_element), group('By rarity', d.by_rarity), group('By region', d.by_region));
 }
 
+function accHistoryMore(d) {
+  const T = (d && d.top_missions) || {}, m30 = (T.last_30_days || []).slice(0, 5), w = T.last_7_days || {}, rec = (w.cleared_recently || []).slice(0, 6), old = ((d && d.longest_serving && d.longest_serving.rows) || []).slice(0, 5);
+  return [
+    m30.length ? [h('h2', {}, 'Last 30 days'), h('div', { class: 'box' }, m30.map(m => h('div', { class: 'kvrow' }, h('span', {}, m.name), h('span', {}, `${fmt(m.runs ?? m.clears ?? 0)} runs`), h('span', { class: 'faint' }, m.area_name || ''))))] : null,
+    rec.length ? [h('h2', {}, `Cleared in the last 7 days (${fmt(w.runs || 0)} runs)`), h('div', { class: 'box' }, rec.map(m => h('div', { class: 'kvrow' }, h('span', {}, m.name), h('span', { class: 'faint' }, m.area_name || ''), h('span', { class: 'faint' }, m.last_cleared_at ? when(m.last_cleared_at) : ''))))] : null,
+    old.length ? [h('h2', {}, 'With you the longest'), h('div', { class: 'box' }, old.map(u => h('div', { class: 'kvrow' }, h('a', { href: `#/units/${Number(u.unit_id)}` }, u.name), h('span', {}, `Lv ${u.level}`), h('span', {}))))] : null];
+}
+
+// ---- Items: what is in your item box
+function accItems(body) {
+  const items = ((MS.profile && MS.profile.items) || []).slice().sort((a, b) => a.type - b.type || String(a.name).localeCompare(String(b.name)));
+  const P = (MS.profile && MS.profile.player) || {}, byType = {};
+  for (const i of items) (byType[i.type] ||= []).push(i);
+  body.replaceChildren(h('p', { class: 'faint' }, `Your item box: ${fmt((P.item_box || {}).used || items.length)} of ${fmt((P.item_box || {}).capacity || 0)} kinds. "Worn" means equipped on a unit right now.`),
+    Object.entries(byType).map(([t, list]) => [h('h2', {}, (ITEM_TYPES[t] || 'Item') + (list.length ? ` (${list.length})` : '')),
+      h('div', { class: 'box' }, list.map(i => h('div', { class: 'itemrow' }, h('img', { src: itemIcon(i.item_id), alt: '', width: 32, height: 32, loading: 'lazy' }), h('a', { href: `#/items/${i.item_id}` }, i.name),
+        h('span', { class: 'num' }, `× ${fmt(i.owned ?? i.stock)}`), h('span', { class: 'faint' }, i.worn ? `${i.worn} worn, ${fmt(i.stock)} free` : ''))))]),
+    items.length ? null : h('p', { class: 'dim' }, 'Your item box is empty.'));
+}
+
+// ---- Profile: the account itself
+function accProfile(body) {
+  const P = (MS.profile && MS.profile.player) || {}, C = (MS.profile && MS.profile.currencies) || {}, L = (MS.profile && MS.profile.login) || {};
+  const kv = (k, v) => (v == null || v === '' ? null : h('div', { class: 'kvrow two' }, h('span', { class: 'dim' }, k), h('span', {}, v)));
+  const day = t => (t ? fmtWhen.format(new Date(t * 1000)) : null), of = o => (o ? `${fmt(o.used ?? o.count ?? o.now ?? 0)} / ${fmt(o.capacity ?? o.max ?? 0)}` : null);
+  const label = k => k.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+  const money = Object.entries(C).map(([k, v]) => typeof v === 'number' ? kv(label(k), fmt(v)) : v && typeof v === 'object' && !Array.isArray(v) && v.available != null ? kv(label(k), `${fmt(v.available)} free of ${fmt(v.total)}`) : null);
+  const tokens = [...(C.event_tokens || []).map(t => kv(t.name, fmt(t.count))), ...(C.summon_tickets || []).map(t => kv(t.name || `Summon ticket ${t.id}`, fmt(t.count))), ...(C.selector_tickets || []).map(t => kv(t.name || `Selector ticket ${t.id}`, fmt(t.count)))];
+  body.replaceChildren(
+    h('h2', {}, 'Summoner'), h('div', { class: 'box' }, kv('Name', P.name), kv('Level', P.level != null ? `${P.level} · ${fmt(P.exp_to_next)} EXP to next` : null), kv('Friend ID', P.friend_id), kv('Playing since', day(P.joined_at)), kv('Last login', day(P.last_login_at)),
+      kv('Hunter rank', P.hunter_rank), kv('Guild', P.guild ? (P.guild.name || 'yes') : 'none'), kv('Unit box', of(P.unit_box)), kv('Item box', of(P.item_box)), kv('Friends', of(P.friends)), kv('Squad cost cap', P.deck_cost_cap)),
+    h('h2', {}, 'Currencies'), h('div', { class: 'box' }, money),
+    tokens.length ? [h('h2', {}, 'Tokens and tickets'), h('div', { class: 'box' }, tokens)] : null,
+    h('h2', {}, 'Lifetime'), h('div', { class: 'box' }, kv('Login days', L.login_days), kv('Login streak', L.streak), kv('Quest wins', fmt(L.quest_wins || 0)), kv('Units fused', fmt(L.units_fused || 0)), kv('Units evolved', fmt(L.units_evolved || 0)), kv('Best spark count', fmt(L.best_sparks || 0))));
+}
+
 // Support: the shape (keys and types, no values) of the account parts that have no page yet, written to the log.
 async function accProbe(view) {
   const shape = (o, d = 0) => Array.isArray(o) ? (o.length ? [`${o.length} x`, shape(o[0], d + 1)] : []) : o && typeof o === 'object' ? (d > 4 ? '{..}' : Object.fromEntries(Object.entries(o).slice(0, 40).map(([k, v]) => [k, shape(v, d + 1)]))) : (typeof o === 'string' ? `str:${o.slice(0, 60)}` : o);
@@ -207,4 +270,29 @@ async function accProbe(view) {
   }
   try { const b = await msPart('builder'); const t = (b.themes || [])[0]; if (t && !t.needs_unit) { const d = await msPart('builder/' + t.theme); console.warn('msprobe builder/' + t.theme + ' ' + JSON.stringify(shape(d)).slice(0, 6000)); } } catch (e) { console.warn('msprobe builder-theme ERROR ' + e.message); }
   out.append('done\n');
+}
+
+// Support: tries what a user would tap (through the same functions and buttons) and logs each outcome as "mstest ...".
+async function accSelfTest(view) {
+  if (!MS.profile || accSelfTest.running) return; accSelfTest.running = true;   // once, and only after the account has loaded
+  const log = (name, ok, info) => console.warn(`mstest ${ok ? 'OK  ' : 'FAIL'} ${name} ${info == null ? '' : String(info).slice(0, 300)}`);
+  const step = async (name, fn) => { try { log(name, true, await fn()); } catch (e) { log(name, false, `${e.status || ''} ${e.message}`); } };
+  const wait = ms => new Promise(r => setTimeout(r, ms)), byText = (root, re) => [...root.querySelectorAll('button, a')].find(b => re.test(b.textContent));
+  const top = ((MS.profile && MS.profile.units) || []).slice().sort((a, b) => b.level - a.level)[0];
+  let themes = [];
+  await step('builder themes', async () => { themes = (await msPart('builder')).themes || []; return themes.map(t => t.theme + (t.needs_unit ? '*' : '')).join(','); });
+  const around = themes.find(t => t.needs_unit);
+  await step('build around a unit', async () => { const d = await msPart(`builder/${around.theme}?unit=${top.user_unit_id}`); return `${around.theme} status=${d.status} members=${(d.members || []).length}`; });
+  await step('friend leader try-out', async () => { const a = await msPart('squads/1?kind=squad'), b = await msPart('squads/1?kind=squad&friend=850858'); return `friend=${b.friend ? b.friend.name || 'set' : 'null'}; coverage changed=${JSON.stringify(a.coverage) !== JSON.stringify(b.coverage)}`; });
+  await step('evolution targets', async () => { const ev = ((await msPart('evolutions')).units || [])[0]; const d = await msPart(`evolutions?targets=${ev.user_unit_id}`); return `targets=${JSON.stringify(d.shopping_list && d.shopping_list.targets)} materials=${((d.shopping_list || {}).materials || []).length}`; });
+  await step('Evolve: + list, then shopping list', async () => { await renderAccount(view, 'evolve'); const b = byText(view, /^\+ list$/); b.click(); const on = b.textContent; byText(view, /^Shopping list$/).click(); await wait(2500); return `button now "${on}", picked=${ACC.targets.size}, table rows=${view.querySelectorAll('table.shop tr').length}`; });
+  ACC.targets.clear();
+  await step('Squads: share', async () => { await renderAccount(view, 'squads'); await wait(1500); const b = byText(view, /share my squad/); b.click(); await wait(300); return 'clicked without error'; });
+  await step('Squads: friend button present', async () => (byText(view, /try a friend leader/) ? 'yes' : 'missing'));
+  await step('Build: open in Team Builder', async () => { ACC.theme = (themes.find(t => !t.needs_unit) || {}).theme; await renderAccount(view, 'build'); await wait(2500); const n = COLL.squads.length; byText(view, /open in Team Builder/).click(); await wait(300); const made = COLL.squads.find(x => /^Plan: /.test(x.name));
+    const info = `squads ${n} -> ${COLL.squads.length}, plan="${made && made.name}", units=${made && made.units.filter(Boolean).length}, hash=${location.hash}`; if (made) { COLL.squads.splice(COLL.squads.indexOf(made), 1); COLL.active = 0; COLL.save(); } return info; });
+  await step('item stock tag', async () => { const it = (MS.profile.items || [])[0]; const el = stockTag(it.item_id); return el && el.textContent; });
+  await step('unit page advice', async () => { const el = msAdvice(Number(top.unit_id)); await wait(2500); return el ? el.textContent.slice(0, 160) : 'none'; });
+  console.warn('mstest DONE');
+  view.replaceChildren(h('p', {}, 'Self-test finished; see the log.'));
 }

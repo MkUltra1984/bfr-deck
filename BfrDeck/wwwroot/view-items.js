@@ -41,7 +41,7 @@ function renderItemPage(view, id) {
   const s = itemSources(id);
   const out = h('div', {}, backLink('#/items'),
     h('div', { class: 'hero' }, h('img', { class: 'big', src: itemIcon(id), alt: '', onerror: e => { e.target.style.visibility = 'hidden'; } }),
-      h('div', {}, h('h1', {}, it[0]), h('div', {}, h('span', { class: 'chip static' }, ITEM_TYPES[it[1]] || 'Item'), h('span', { class: 'chip static' }, `No. ${id}`)),
+      h('div', {}, h('h1', {}, it[0]), h('div', {}, h('span', { class: 'chip static' }, ITEM_TYPES[it[1]] || 'Item'), h('span', { class: 'chip static' }, `No. ${id}`), stockTag(id)),
         h('div', { class: 'row', style: 'margin-top:6px' }, siteLink('Open on bfrevive.net', `/items/#i=${id}`),
           h('a', { href: '#', onclick: ev => { ev.preventDefault(); host.open('wiki', `https://bravefrontierglobal.fandom.com/wiki/Special:Search?query=${encodeURIComponent(it[0])}`); } }, 'Wiki')))),
     it[4] ? h('p', { class: 'dim' }, it[4]) : null);
