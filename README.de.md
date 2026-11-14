@@ -26,7 +26,7 @@
 
 - **Was es ist:** ein kleines Windows-Programm mit sieben Tabs: Home, Units, Tier List, Summon, Quests, Team Builder und ein Einsteiger-Guide.
 - **Für wen:** neue und zurückkehrende Spieler, die Antworten wollen, ohne zu suchen: Soll ich ziehen, was ist heute offen, wer fehlt in meinem Squad.
-- **Nur lesend:** Es liest die öffentlichen Daten von bfrevive.net und, nur wenn du es einschaltest, ein Bild deines Emulatorfensters. Keine Eingaben, kein Auslesen des Speichers, kein Mitlesen des Netzwerks.
+- **Nur lesend:** Es liest die öffentlichen Daten von bfrevive.net und, nur wenn du es einschaltest, ein Bild deines Emulatorfensters. Wenn du dich anmeldest, liest es außerdem dein eigenes Konto aus My Summoner (bfrevive.net/my-summoner). Keine Eingaben, kein Auslesen des Speichers, kein Mitlesen des Netzwerks.
 - **Frei und offen:** MIT-Lizenz, der komplette Quellcode liegt in diesem Repository.
 
 **Auf dieser Seite:** [Installation](#installation) · [Was es kann](#was-es-kann) · [Für das BFR-Team und Prüfer](#für-das-bfr-team-und-prüfer) · [Selbst bauen](#selbst-bauen) · [Dank und Lizenz](#dank-und-lizenz)
@@ -145,7 +145,8 @@ Anfragen des Decks geben sich als `BfrDeck/0.1 (+companion app; read-only)` zu e
 
 - Es sendet keine Eingaben an das Spiel: keine Klicks, keine Makros, keine Automatisierung.
 - Es liest und schreibt weder den Speicher noch die Dateien des Spiels und fasst weder den Emulator noch die APK an.
-- Es liest, verändert oder wiederholt keinen Netzwerkverkehr. Es kennt kein Konto, kein Passwort und kein Token.
+- Es liest, verändert oder wiederholt keinen Netzwerkverkehr.
+- Es kennt kein Konto, solange du dich nicht selbst anmeldest. Dann gehen deine Zugangsdaten nur an bfrevive.net, das Deck liest dein Konto nur und ändert nie etwas daran, und „angemeldet bleiben“ legt die Zugangsdaten von Windows geschützt für deinen Benutzer auf deinem PC ab. Abmelden entfernt sie.
 - Es sammelt nichts: keine Telemetrie, keine Statistik, kein eigener Server. Deine Box und deine Squads bleiben auf deinem PC.
 
 **Falls etwas geändert werden soll:** Wenn das Deck eure Server zu oft anfragt, Daten zeigt, die ihr lieber nicht gezeigt hättet, oder etwas falsch formuliert, [öffnet ein Issue](https://github.com/MkUltra1984/bfr-deck/issues) oder sagt es mir im BFR-Discord, und ich ändere es.

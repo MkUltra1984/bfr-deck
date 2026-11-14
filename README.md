@@ -24,7 +24,7 @@
 
 - **What it is:** a small Windows program with seven tabs: Home, Units, Tier List, Summon, Quests, Team Builder and a beginner Guide.
 - **Who it is for:** new and returning players who want answers without digging: should I pull, what is open today, who is missing in my squad.
-- **Read-only:** it reads the public data of bfrevive.net and, only if you switch it on, a picture of your emulator window. No input, no memory reading, no network sniffing.
+- **Read-only:** it reads the public data of bfrevive.net and, only if you switch it on, a picture of your emulator window. If you sign in, it also reads your own account from My Summoner (bfrevive.net/my-summoner). No input, no memory reading, no network sniffing.
 - **Free and open:** MIT license, the complete source is in this repository.
 
 **On this page:** [Install](#install) · [What it does](#what-it-does) · [For the BFR team and reviewers](#for-the-bfr-team-and-reviewers) · [Build from source](#build-from-source) · [Credits and license](#credits-and-license)
@@ -143,7 +143,8 @@ Requests from the deck identify themselves as `BfrDeck/0.1 (+companion app; read
 
 - It sends no input to the game: no clicks, no macros, no automation.
 - It does not read or write the game's memory or files, and it does not touch the emulator or the APK.
-- It does not read, change or replay network traffic. It knows no account, password or token.
+- It does not read, change or replay network traffic.
+- It knows no account unless you sign in yourself. Then your login goes only to bfrevive.net, the deck only reads your account and never changes it, and "stay signed in" keeps the login protected by Windows for your user on your PC. Signing out removes it.
 - It collects nothing: no telemetry, no analytics, no server of its own. Your box and squads stay on your PC.
 
 **If something should change:** if the deck asks your servers too often, shows data you would rather not have shown, or words something wrongly, [open an issue](https://github.com/MkUltra1984/bfr-deck/issues) or tell me on the BFR Discord and I will change it.

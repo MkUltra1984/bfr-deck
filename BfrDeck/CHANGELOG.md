@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 (2026-11-14)
+
+- **Your account, live.** Sign in with your game login and the deck reads your account from My Summoner (bfrevive.net/my-summoner), with the BFR team's agreement. Read-only: the login goes only to bfrevive.net and nothing in your account is changed. "Stay signed in" keeps the login protected by Windows for your user.
+- **Home:** level, energy, arena orbs, gifts, unit box and cost cap in one row, "What next" as three short steps with the reason behind "Why?", today's pointers, and your real squads with their check.
+- **My Account (new tab):** to do, squads (what each covers, who is not ready, sphere plan, friend leader try-out, share as text), build a team from your box by theme or around one unit, evolve with a shopping list for the units you pick, challenges, story, collection, items with your stock, history and profile.
+- **Units:** a unit you own shows My Summoner's advice (tier and rank among your units, which of your spheres suit it, what to improve); your box lists every copy by power, level or rarity. Where My Summoner has no answer (units you do not own, SP builds, squads planned in the deck) the deck's own result stays and is marked as an estimate.
+- Without signing in, the deck works as before.
+
 ## 1.2.4 (2026-11-12)
 
 - **Easy to get early:** under the two best spheres, unit pages show two that a new player can get: at most 5 stars, dropped in quests or crafted in town from materials that drop.

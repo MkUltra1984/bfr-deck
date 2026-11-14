@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BfrDeck</AssemblyName>
     <RootNamespace>BfrDeck</RootNamespace>
-    <Version>1.2.4</Version>
+    <Version>1.3.0</Version>
     <Authors>MkUltra1984</Authors>
     <Description>BFR Deck: a read-only desktop companion for Brave Frontier Revived.</Description>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
