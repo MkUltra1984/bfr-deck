@@ -139,7 +139,7 @@ function pullTile(now) {
     const got = await pickUnit({ title: `I pulled on ${g.title}`, ids: pool.map(([uid]) => Number(uid)), multi: true, hint: 'Tick every unit you got (dupes count once). Done adds them to your box.' });
     if (got && got.length) { for (const id of got) COLL.owned.add(Number(id)); COLL.save(); toast(`${got.length} unit${got.length === 1 ? '' : 's'} added to your box`); tile.replaceWith(pullTile(Date.now() / 1000)); }
   } }, 'I pulled…');
-  const verdict = !COLL.owned.size ? 'Bars fill as you mark units owned (✔ on unit cards), or scan your box.'
+  const verdict = !COLL.owned.size ? 'Bars fill once you sign in, or as you mark units owned (✔ on unit cards).'
     : pNew === 0 ? 'You own everything on this gate.' : pNew > .5 ? `${pct(100 * pNew)} of pulls give something new. Good value${price ? `, about ${Math.ceil(price / pNew)} gems per new unit` : ''}.`
     : pNew > .2 ? `${pct(100 * pNew)} new per pull${price ? `, about ${Math.ceil(price / pNew)} gems per new unit` : ''}. Set a gem budget.` : `Only ${pct(100 * pNew)} new per pull: mostly dupes (5 SP each on Omnis). Pull for a specific unit only.`;
   // Redesign: the verdict is the headline; the odds table and the bars wait behind one click (state kept per session).

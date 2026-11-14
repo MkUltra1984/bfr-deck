@@ -112,7 +112,7 @@ function msSignIn(onDone) {
 async function msSignOut(onDone) {
   try { await msCall('logout?forget=1', { method: 'POST' }); } catch { }
   MS.home = MS.profile = MS.box = MS.squads = null; MS.byUnit = new Map(); MS.state = { signedIn: false, saved: false };
-  if (confirm('Signed out. Bring back the box from your last scan and remove the live squads? (Cancel keeps what was read from your account.)')) msRestoreScan(); else localStorage.removeItem('ownedBeforeLive');
+  if (confirm('Signed out. Bring back the box you had before signing in and remove the squads read from your account? (Cancel keeps what was read.)')) msRestoreScan(); else localStorage.removeItem('ownedBeforeLive');
   if (onDone) onDone();
 }
 

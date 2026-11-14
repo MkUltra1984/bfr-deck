@@ -96,7 +96,7 @@ const GLOSSARY = {
   'Squad': ['Squad', 'Your team of up to five units plus a friend lead. Slot 1 is the leader; only its leader skill applies.'],
   'Leader': ['Leader', 'The unit in slot 1. Its leader skill applies to the whole squad; the other four units\' leader skills do nothing.'],
   'Team code': ['Team code', 'A short text you can copy and paste to share this squad with someone else using BFR Deck.'],
-  'Box': ['Box', 'All the units you own. The deck learns your box from the unit scan or from ticking units owned.'],
+  'Box': ['Box', 'All the units you own. The deck learns your box from your account when you sign in, or from ticking units owned.'],
   'Unit slots': ['Unit slots', 'How many units your box can hold. Expand with gems, or sell and fuse units you do not need.'],
   'Dupes': ['Duplicates', 'Extra copies of a unit. On Omnis each dupe gives 5 SP; otherwise they are fusion food or sellable.'],
   'Featured': ['Featured', 'Units with raised rates on a summon gate this week.'],

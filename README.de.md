@@ -42,6 +42,15 @@
 
 ## Was es kann
 
+### Dein Konto, live
+
+![My Account: Squads, Team-Builder, Entwicklungen und mehr, aus deinem Konto gelesen](docs/img/show/account.png)
+
+- Melde dich mit deinem Spiel-Login an, und das Deck liest dein Konto aus My Summoner (bfrevive.net/my-summoner): Level, Energie, Währungen, deine Box, deine Squads und deine Items. Nur lesend, und die Zugangsdaten gehen nur an bfrevive.net.
+- **My Account:** was als Nächstes ansteht, die Prüfung jedes Squads mit einem Sphären-Plan aus deinen eigenen Sphären, ein Team-Builder, der aus deiner Box wählt, was deine Einheiten zum Entwickeln brauchen samt Einkaufsliste, Herausforderungen, Story, Sammlung und Verlauf.
+- Eine Einheit, die du besitzt, zeigt, welche deiner Sphären zu ihr passen und was zu verbessern ist.
+- Ohne Anmeldung funktioniert das Deck auch: Hake die Einheiten, die du besitzt, von Hand ab. Die neuen Seiten sind vorerst auf Englisch.
+
 ### Startseite (Home)
 
 - **Reset-Timer** für Dailies, den Vortex-Tag und den Weekly Selector.
@@ -103,14 +112,6 @@
 - Eine kurze Seite pro Thema: Währungen, Frösche, Entwicklung, Imps, Sphären, Farm-Tage, Beschwörungen.
 - Spielbegriffe erklären sich überall im Deck selbst, wenn man mit der Maus darauf zeigt.
 
-### Einheiten-Scanner
-
-![Einheiten-Scanner](docs/img/show/scan.png)
-
-- Die Einheitenliste im Spiel öffnen und scrollen. Das Deck sieht ein Bild des Emulatorfensters, erkennt jedes Icon und liest die ×N-Stapel.
-- Keine Kalibrierung, und es funktioniert mit jedem Emulator. Deine Hauptgruppe wird Squad 1.
-- Kein aufgenommenes Bild bleibt auf der Festplatte.
-
 ### Angedockt neben dem Emulator
 
 ![BFR Deck angedockt neben BlueStacks](docs/img/show/docked.png)
@@ -136,7 +137,7 @@
 | `bfrevive.net/units/u/<id>.json` | die Skills einer Einheit, wenn ihre Seite geöffnet wird oder eine Liste sie braucht | auf der Festplatte zwischengespeichert |
 | `cdn.bfrevive.net` | Icons, Sprites, Item- und Torbilder | 14 Tage zwischengespeichert, höchstens 300 MB |
 | die Tabs „BFRevived“ und „Wiki“ | bfrevive.net und das Brave-Frontier-Wiki, in einem eingebetteten Browser angezeigt wie in jedem Browser | nur wenn du sie öffnest |
-| das Emulatorfenster (freiwillig) | ein Bild des Bildschirms für Live-Werte und den Einheiten-Scanner, gelesen mit der Texterkennung von Windows | nur solange eingeschaltet |
+| das Emulatorfenster (freiwillig) | ein Bild des Bildschirms für Live-Werte, gelesen mit der Texterkennung von Windows | nur solange eingeschaltet |
 | `github.com/MkUltra1984/bfr-deck` | die Update-Prüfung | beim Start und alle 6 Stunden |
 
 Anfragen des Decks geben sich als `BfrDeck/0.1 (+companion app; read-only)` zu erkennen. Ist die Seite nicht erreichbar, zeigt das Deck seine letzte gute Kopie.

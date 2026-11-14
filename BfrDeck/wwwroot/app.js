@@ -1,8 +1,8 @@
 'use strict';
 // Router and data bootstrap.
 
-const VIEWS = { home: renderHome, account: renderAccount, units: renderUnits, items: renderItems, summon: renderGates, gates: renderGates, team: renderTeam, guide: renderGuide, quests: renderQuests, vortex: renderVortex, gq: renderGrandQuest, scan: renderScan, tier: renderTier };
-const NAV_OF = { items: 'units', gates: 'summon', scan: 'units', vortex: 'quests', gq: 'quests' };
+const VIEWS = { home: renderHome, account: renderAccount, units: renderUnits, items: renderItems, summon: renderGates, gates: renderGates, team: renderTeam, guide: renderGuide, quests: renderQuests, vortex: renderVortex, gq: renderGrandQuest, tier: renderTier };
+const NAV_OF = { items: 'units', gates: 'summon', vortex: 'quests', gq: 'quests' };
 let ready = false;
 
 function route() {
@@ -17,9 +17,6 @@ function route() {
   }
   if (name === 'home' && arg === 'setsquad1' && m[3]) {   // #/home/setsquad1/<id-id-id-id-id>: restore Squad 1 (support)
     COLL.squads[0].units = m[3].split('-').map(x => x === '0' ? null : Number(x)).slice(0, 5); while (COLL.squads[0].units.length < 5) COLL.squads[0].units.push(null); COLL.save(); location.hash = '#/home'; return;
-  }
-  if (name === 'scan' && arg === 'debug') {   // #/scan/debug/10312-30131: log those cells' badge crops during the next scans (support); #/scan/debug/off clears
-    store.set('scanDebugIds', m[3] && m[3] !== 'off' ? m[3].replace(/-/g, ',') : ''); toast(m[3] && m[3] !== 'off' ? `Badge crops logged for ${m[3].split('-').length} unit(s)` : 'Badge crop logging off'); location.hash = '#/scan'; return;
   }
   if (name === 'home' && arg === 'intro' && ready) {   // #/home/intro[/N]: replay the introduction, optionally at tour card N (support / screenshots)
     for (const a of document.querySelectorAll('#nav a')) a.classList.toggle('on', a.dataset.v === 'home');

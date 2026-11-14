@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1 (2026-11-14)
+
+- **The unit scanner is gone.** Signing in reads your box from your account, exactly and in a second, so the screen scan is no longer needed. Without signing in, tick the units you own by hand. The first-start tour now ends with the sign-in.
+
 ## 1.3.0 (2026-11-14)
 
 - **Your account, live.** Sign in with your game login and the deck reads your account from My Summoner (bfrevive.net/my-summoner), with the BFR team's agreement. Read-only: the login goes only to bfrevive.net and nothing in your account is changed. "Stay signed in" keeps the login protected by Windows for your user.

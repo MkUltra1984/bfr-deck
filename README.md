@@ -40,6 +40,15 @@
 
 ## What it does
 
+### Your account, live
+
+![My Account: squads, team builder, evolve and more, read from your account](docs/img/show/account.png)
+
+- Sign in with your game login and the deck reads your account from My Summoner (bfrevive.net/my-summoner): level, energy, currencies, your box, your squads and your items. Read-only, and the login goes only to bfrevive.net.
+- **My Account:** what to do next, each squad's check with a sphere plan from the spheres you own, a team builder that picks from your box, what your units need to evolve with a shopping list, challenges, story, collection and history.
+- A unit you own shows which of your spheres suit it and what to improve.
+- Without signing in, the deck works too: tick the units you own by hand.
+
 ### Home
 
 - **Reset timers** for dailies, the Vortex day and the weekly selector.
@@ -101,14 +110,6 @@
 - One short page per topic: currencies, frogs, evolution, imps, spheres, farming days, summons.
 - Game terms anywhere in the deck explain themselves when you hover over them.
 
-### Unit scanner
-
-![Unit scanner](docs/img/show/scan.png)
-
-- Open the unit list in the game and scroll. The deck watches a picture of the emulator window, matches every icon and reads the ×N stacks.
-- No calibration, and it works with any emulator. Your main party becomes Squad 1.
-- No captured frame stays on disk.
-
 ### Docked beside the emulator
 
 ![BFR Deck docked beside BlueStacks](docs/img/show/docked.png)
@@ -134,7 +135,7 @@
 | `bfrevive.net/units/u/<id>.json` | one unit's skills, when its page is opened or a list needs it | cached on disk |
 | `cdn.bfrevive.net` | unit icons, sprites, item and gate pictures | cached for 14 days, 300 MB at most |
 | the "BFRevived" and "Wiki" tabs | bfrevive.net and the Brave Frontier wiki, shown in an embedded browser like any browser would | only when you open them |
-| the emulator window (optional) | a picture of the screen for live stats and the unit scanner, read with Windows' own text recognition | only while switched on |
+| the emulator window (optional) | a picture of the screen for live stats, read with Windows' own text recognition | only while switched on |
 | `github.com/MkUltra1984/bfr-deck` | the update check | at start and every 6 hours |
 
 Requests from the deck identify themselves as `BfrDeck/0.1 (+companion app; read-only)`. When the site cannot be reached, the deck shows its last good copy.

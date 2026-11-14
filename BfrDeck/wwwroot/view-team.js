@@ -135,7 +135,7 @@ function renderTeam(view) {
         const cands = owned.filter(id => roles[id] && roles[id].roles.includes(k)).sort((a, b) => fullScore(b) - fullScore(a)).slice(0, 4);
         sugg.append(h('div', { class: 'gaprow' }, h('span', { class: 'gaplabel' }, label), cands.length ? h('span', { class: 'row', style: 'gap:6px' }, cands.map(id => h('button', { class: 'cand', title: `${unitName(id)} · add to squad`, onclick: () => place(id) }, h('img', { src: unitIcon(id), alt: '', width: 30, height: 30 }), shortUnitName(id)))) : h('span', { class: 'faint' }, 'none in your box')));
       }
-    } else if (gaps.length) sugg.append(h('p', { class: 'faint' }, `Missing: ${gaps.map(g => g[1]).join('; ')}. Scan or mark your units and the deck suggests who could fill these.`));
+    } else if (gaps.length) sugg.append(h('p', { class: 'faint' }, `Missing: ${gaps.map(g => g[1]).join('; ')}. Sign in or mark your units and the deck suggests who could fill these.`));
     analysis.replaceChildren(
       h('div', { class: 'row', style: 'justify-content:space-between' }, h('b', {}, 'Totals'), h('span', { class: 'faint' }, `${elements.size} element${elements.size === 1 ? '' : 's'}: ${[...elements].filter(Boolean).map(e => ELEMENTS[e]).join(', ') || '—'}`), impsToggle), totals,
       h('div', { class: 'cols', style: 'margin-top:8px' }, lsBox('Leader skill', s.units[0]), lsBox('Friend leader skill', s.friend)),
