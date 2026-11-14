@@ -189,7 +189,7 @@ function msOwnedSpheres() {
 function ownedSpherePicks(id, u, n = 2, used = null) {
   const own = msOwnedSpheres(); if (!own.size || !u) return [];
   const focus = sphereFocus(u), el = (ELEMENTS[unitElement(id)] || '').toLowerCase();
-  const fit = s => { if (s.only && el && !s.only.includes(el)) return 0; let t = 0; for (const [k, v] of Object.entries(s.f)) t += v * (focus.w[k] || 0); const r = sphereRec(s.name); return r && r[0] ? t * 1.33 : t; };
+  const fit = s => { if (s.only && el && !s.only.includes(el)) return 0; let t = 0; for (const [k, v] of Object.entries(s.f)) t += v * (focus.w[k] || 0); return t; };
   const why = s => Object.entries(s.f).map(([k, v]) => [k, v * (focus.w[k] || 0)]).sort((a, b) => b[1] - a[1]).slice(0, 2).filter(x => x[1] > 0).map(x => SPH_LABEL[x[0]]);
   const left = s => own.get(s.id).owned - ((used && used.get(s.id)) || 0);
   const pool = sphereList().filter(s => own.has(s.id) && left(s) > 0).map(s => [s, fit(s)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1] || b[0].rarity - a[0].rarity);
@@ -231,7 +231,7 @@ function gearBlock(s) {
   if (!MS.profile || !s) return null;
   const own = msOwnedSpheres(); if (!own.size) return null;
   const list = h('div', { class: 'gearlist' }, h('span', { class: 'faint' }, 'working it out…'));
-  const box = h('details', { class: 'livesq gear' }, h('summary', {}, h('b', {}, 'Best spheres for this squad '), h('span', { class: 'faint' }, s.live ? "My Summoner's plan, within what you own" : `from the ${own.size} kinds you own, each sphere given once`)), list);
+  const box = h('details', { class: 'livesq gear' }, h('summary', {}, h('b', {}, 'Best spheres for this squad '), h('span', { class: 'faint' }, s.live ? "My Summoner's plan, within what you own" : `BFR Deck's estimate for a squad planned here, from the ${own.size} kinds you own`)), list);
   box.open = store.get('gearOpen', false); box.addEventListener('toggle', () => store.set('gearOpen', box.open));
   (async () => {
     if (s.live) {
@@ -255,33 +255,77 @@ function gearBlock(s) {
   return box;
 }
 
-// Unit page: My Summoner's report on one of your copies (its power and rank among your units, what it does, where it
-// fits, what to improve, which of your spheres suit it), loaded when asked for.
+// My Summoner's report on one of your copies, written into `out`: its tier and rank among your units, what it does,
+// which of YOUR spheres suit it, what to improve, where it fits. This is the main advice on a unit page.
+async function renderReport(out, userUnitId) {
+  out.replaceChildren(h('span', { class: 'faint' }, 'Reading My Summoner…'));
+  try {
+    const [r, b] = await Promise.all([msPart(`units/${userUnitId}`), msPart(`box/${userUnitId}`).catch(() => null)]);
+    const P = (b && b.power) || {}, imp = r.improve || {};
+    const line = (label, items) => (items && items.length ? h('p', {}, h('b', {}, label + ': '), items.join(' · ')) : null);
+    out.replaceChildren(
+      P.tier || P.rank ? h('p', {}, h('span', { class: 'tag gold' }, `tier ${P.tier || '?'}`), P.rank ? ` #${P.rank.place} of ${P.rank.of} of your units` : '', r.power && r.power.explain ? h('span', { class: 'dim' }, ` · ${r.power.explain}`) : null) : null,
+      h('h3', { class: 'spheasy' }, 'Spheres for this unit'),
+      (imp.spheres || []).length ? h('div', { class: 'sphcards' }, imp.spheres.map(x => h('a', { class: 'sphcard', href: `#/items/${x.item_id}` }, h('img', { src: itemIcon(x.item_id), alt: '', width: 40, height: 40, loading: 'lazy' }),
+        h('div', {}, h('div', { class: 'nm' }, x.name, h('span', { class: 'tag green' }, x.state || 'yours')), h('p', {}, (x.why || []).join(' · '))))))
+        : h('p', { class: 'dim' }, 'None of the spheres you own stands out for this unit.'),
+      line('What it does', (r.roles || []).map(x => `${x.label} (${x.reason})`)),
+      line('Among your units', (r.standing || []).map(x => x.text)),
+      line('Strong', P.strong), line('Weak', P.weak), line('Still missing', P.lacks), line('To improve', imp.steps),
+      line('In squads', r.in_squads), line('Fits team themes', (r.fits || []).map(x => x.label)));
+    return true;
+  } catch (e) { out.replaceChildren(h('span', { class: 'red' }, 'No report from My Summoner: ' + e.message)); return false; }
+}
+// The same report for another copy, behind a button (the copies list).
 function copyReport(userUnitId) {
   const out = h('div', { class: 'copyreport' });
-  const btn = h('button', { class: 'chip', onclick: async () => {
-    btn.disabled = true; out.replaceChildren(h('span', { class: 'faint' }, 'Reading the report…'));
-    try {
-      const [r, b] = await Promise.all([msPart(`units/${userUnitId}`), msPart(`box/${userUnitId}`).catch(() => null)]);
-      const P = (b && b.power) || {}, imp = r.improve || {};
-      const line = (label, items) => (items && items.length ? h('p', {}, h('b', {}, label + ': '), items.join(' · ')) : null);
-      out.replaceChildren(
-        P.tier || P.rank ? h('p', {}, h('span', { class: 'tag gold' }, `tier ${P.tier || '?'}`), P.rank ? ` #${P.rank.place} of ${P.rank.of} of your units` : '', r.power && r.power.explain ? h('span', { class: 'dim' }, ` · ${r.power.explain}`) : null) : null,
-        line('What it does', (r.roles || []).map(x => `${x.label} (${x.reason})`)),
-        line('Among your units', (r.standing || []).map(x => x.text)),
-        line('Strong', P.strong), line('Weak', P.weak), line('Still missing', P.lacks),
-        line('To improve', imp.steps),
-        (imp.spheres || []).length ? h('p', {}, h('b', {}, 'Spheres of yours that suit it: '), imp.spheres.map(x => `${x.name} (${x.state}${(x.why || []).length ? '; ' + x.why[0] : ''})`).join(' · ')) : null,
-        line('In squads', r.in_squads), line('Fits team themes', (r.fits || []).map(x => x.label)));
-      btn.remove();
-    } catch (e) { out.replaceChildren(h('span', { class: 'red' }, 'No report: ' + e.message)); btn.disabled = false; }
-  } }, 'report from My Summoner');
+  const btn = h('button', { class: 'chip', onclick: async () => { btn.disabled = true; if (await renderReport(out, userUnitId)) btn.remove(); else btn.disabled = false; } }, 'report from My Summoner');
   return h('div', {}, btn, out);
+}
+// Unit page, a unit you own: My Summoner's advice for your best copy, shown at once.
+function msAdvice(id) {
+  const list = MS.byUnit.get(Number(id)); if (!list || !list.length) return null;
+  const top = [...list].sort((a, b) => b.level - a.level || b.bb_level - a.bb_level)[0];
+  const out = h('div', { class: 'copyreport' });
+  renderReport(out, top.user_unit_id);
+  return h('div', { class: 'sphbox' }, h('h2', {}, "My Summoner's advice"), h('p', { class: 'faint', style: 'margin:0 0 8px' }, `For your ${list.length > 1 ? 'best ' : ''}copy (Lv ${top.level}/${top.max_level}), worked out by My Summoner from your own account.`), out);
+}
+// A block the deck works out itself gets a clear mark while you are signed in: it is not from My Summoner.
+function deckEstimate(el, why) {
+  if (!el || !MS.profile) return el;
+  return h('div', { class: 'estimate' }, h('p', { class: 'estnote' }, h('span', { class: 'tag' }, "BFR Deck's estimate"), ` Not from My Summoner${why ? ': ' + why : '.'}`), el);
+}
+// Team Builder, a squad from your account: My Summoner's own check and sphere plan instead of the deck's.
+function msSquadBox(s) {
+  const out = h('div', {}, h('p', { class: 'dim' }, 'Reading My Summoner…'));
+  (async () => {
+    try {
+      const q = `?kind=${encodeURIComponent(s.live.kind || 'squad')}`;
+      const [d, plan] = await Promise.all([msPart(`squads/${s.live.number}${q}`), msPart(`squads/${s.live.number}/spheres${q}`).catch(() => null)]);
+      out.replaceChildren(h('h2', {}, 'What it covers'), covRows(d.coverage) || h('p', { class: 'dim' }, 'No rating for this squad.'),
+        h('h2', {}, 'Sphere plan'), plan && (plan.moves || []).length ? h('div', { class: 'box' }, h('ol', { class: 'moves' }, plan.moves.map(m => h('li', {}, m.text)))) : h('p', { class: 'dim' }, 'Nothing to change.'),
+        h('p', {}, h('a', { href: '#/account/squads' }, 'Whole squad report ›')));
+    } catch (e) { out.replaceChildren(h('p', { class: 'red' }, 'No squad check from My Summoner: ' + e.message)); }
+  })();
+  return h('div', { class: 'sphbox' }, h('p', { class: 'faint' }, h('span', { class: 'tag gold' }, 'from your account'), ' This squad is read from the game; its check and sphere plan come from My Summoner. Changes you make here are a what-if and are undone by the next refresh.'), out);
+}
+// Tier List page: your own units by the tier My Summoner gives them (strongest first in each tier).
+function msTierBlock() {
+  const B = MS.box; if (!B || !B.columns || !B.rows) return null;
+  const c = B.columns, iu = c.indexOf('unit_id'), it = c.indexOf('tier'), ip = c.indexOf('power'), il = c.indexOf('level');
+  const by = {}; for (const r of B.rows) { const t = r[it]; if (!t) continue; (by[t] ||= []).push(r); }
+  const tiers = ['S', 'A', 'B', 'C', 'D'].filter(t => by[t]);
+  if (!tiers.length) return null;
+  return h('div', { class: 'box mstier' }, h('div', { class: 'row' }, h('b', {}, 'Your units by tier'), h('span', { class: 'grow' }), h('span', { class: 'faint' }, 'tiers from My Summoner')),
+    tiers.map(t => { const rows = by[t].sort((a, b) => (b[ip] || 0) - (a[ip] || 0)), seen = new Set(), ids = [];
+      for (const r of rows) { const id = Number(r[iu]); if (!seen.has(id)) { seen.add(id); ids.push([id, r[ip], r[il]]); } }
+      return h('details', { class: 'evorow', open: t === 'S' || t === 'A' ? '' : null }, h('summary', {}, h('span', { class: 'tag gold' }, `tier ${t}`), h('span', { class: 'grow dim' }, ` ${ids.length} unit${ids.length === 1 ? '' : 's'}`)),
+        h('div', { class: 'tierunits' }, ids.slice(0, 40).map(([id, pw, lv]) => h('a', { class: 'mini', href: `#/units/${id}`, title: `${unitName(id)} · power ${pw} · Lv ${lv}` }, h('img', { src: unitIcon(id), alt: unitName(id), width: 44, height: 44, loading: 'lazy' }))), ids.length > 40 ? h('span', { class: 'faint' }, ` +${ids.length - 40} more`) : null)); }));
 }
 
 // Start: read the account if a login is remembered or a session is open; redraw Home when it arrives.
 async function msBoot() {
   await msLoad(false);
-  // the page that is open was drawn before the account arrived: draw Home, My Account or a unit page again
-  if (MS.home && (!location.hash || /^#\/(home\/?$|account|units\/\d)/.test(location.hash)) && typeof route === 'function' && typeof ready !== 'undefined' && ready) route();
+  // the page that is open was drawn before the account arrived: draw it again (not while a dialog is open)
+  if (MS.home && typeof route === 'function' && typeof ready !== 'undefined' && ready && !document.querySelector('.overlay')) route();
 }

@@ -21,7 +21,7 @@ function renderTier(view, arg) {
   if (!DATA.units || !DATA.meta) { view.replaceChildren(h('p', { class: 'dim' }, 'Unit data not loaded.')); return; }
   const st = TIER.state || (TIER.state = { rarity: 8, elements: new Set(), role: '', owned: false, q: '' });
   if (/^[1-6]$/.test(arg || '')) { st.elements = new Set([Number(arg)]); st.open = { S: true, A: true, B: false, C: false }; }   // #/tier/<1-6>: one element, S and A open (deep link / screenshots)
-  const out = h('div', { class: 'tier' }, h('h1', {}, 'Tier list'),
+  const out = h('div', { class: 'tier' }, h('h1', {}, 'Tier list'), msTierBlock(), MS.profile ? h('p', { class: 'estnote' }, h('span', { class: 'tag' }, "BFR Deck's estimate"), ' The list of all units below is the deck\'s own ranking, not from My Summoner (which rates only the units you own).') : null,
     h('p', { class: 'dim' }, 'Ranked by the game\'s numbers: max HP, ATK, DEF and REC against the best unit in each stat, plus what the skills bring (healing, mitigation, BB fill, buffs, cleanse, hit count). S is the top 8 %, A the next 17 %, B the next 30 %. A formula, not a verdict: a unit with a niche leader skill can matter more than its tier says.'));
   const chip = (on, label, fn) => h('button', { class: on ? 'chip on' : 'chip', onclick: fn }, label);
   const filters = h('div', { class: 'filters' },

@@ -155,6 +155,6 @@ function renderTeam(view) {
     h('span', { class: 'grow' }),
     h('button', { class: 'icon', onclick: () => { navigator.clipboard.writeText(COLL.export()); toast('Collection copied to clipboard'); } }, 'export all'),
     h('button', { class: 'icon', onclick: async () => { try { COLL.import(await navigator.clipboard.readText()); toast('Imported'); renderTeam(view); } catch (e) { toast('Clipboard has no valid export'); } } }, 'import all'));
-  view.replaceChildren(h('div', { class: 'teambuilder' }, tabs, slots, help, analysis, share,
+  view.replaceChildren(h('div', { class: 'teambuilder' }, tabs, slots, help, s.live ? msSquadBox(s) : deckEstimate(analysis, 'this squad was planned here and is not in your account'), share,
     h('details', {}, h('summary', {}, 'Calculators: evolution, frogs, SP, imps'), h('div', { class: 'calc' }, h('h2', {}, 'Evolution'), evoPlanner(), h('h2', {}, 'BB / SBB levels'), bbPlanner(), h('h2', {}, 'SP (Omni)'), spPlanner(), h('h2', {}, 'Imps'), impPlanner()))));
 }
